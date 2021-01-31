@@ -213,17 +213,19 @@ class TestMixedInteger(unittest.TestCase):
         plt.show()
         
     def test_mixed_gower(self):
-        from smt.applications.mixed_integer import MixedIntegerSurrogateModel
+        from smt.applications.mixed_integer import MixedIntegerSurrogateModel, ENUM
+        from smt.surrogate_models import KRG
         import matplotlib.pyplot as plt
-
+        import numpy as np
+        
         xt = np.linspace(1.0, 5.0, 5)
         x_train = np.array(["%.2f" % i for i in xt],dtype=object)
         yt = np.array([0.0, 1.0, 1.5, 0.5, 1.0])
-
+        
         xlimits =  [["0.0", "1.0"," 2.0", "3.0", "4.0"]]
-
+        
         # Surrogate
-        sm = MixedIntegerSurrogateModel.build_surrogate_model(type_surrogate = 'Gower',xtypes=[(ENUM,5)], xlimits=xlimits, surrogate=KRG(theta0=[1e-2]))
+        sm = MixedIntegerSurrogateModel(type_surrogate = 'Gower',xtypes=[(ENUM,5)], xlimits=xlimits, surrogate=KRG(theta0=[1e-2]))
         sm.set_training_values(x_train, yt)
         sm.train()
         
@@ -232,7 +234,7 @@ class TestMixedInteger(unittest.TestCase):
         x = np.linspace(0, 5, num)
         x_pred = np.array(["%.2f" % i for i in x],dtype=object)
         y = sm.predict_values(x_pred)
-
+        
         plt.plot(xt, yt, "o")
         plt.plot(x, y)
         plt.xlabel("actual")

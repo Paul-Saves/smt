@@ -133,12 +133,12 @@ class KrgBased(SurrogateModel):
                 Xt = X
                 x_n_rows, x_n_cols = Xt.shape
                 if not isinstance(Xt, np.ndarray): 
-                    is_number = np.vectorize(lambda x: not np.issubdtype(x, np.number))
+                    is_number = np.vectorize(lambda x: not np.issubdtype(x,  np.float))
                     cat_features = is_number(Xt.dtypes)    
                 else:
                     cat_features = np.zeros(x_n_cols, dtype=bool)
                     for col in range(x_n_cols):
-                        if not np.issubdtype(type(Xt[0, col]), np.number):
+                        if not np.issubdtype(type(Xt[0, col]),  np.float):
                             cat_features[col]=True   
 
                     if not isinstance(Xt, np.ndarray): Xt = np.asarray(Xt)

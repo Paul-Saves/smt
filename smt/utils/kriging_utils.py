@@ -560,7 +560,7 @@ def matrix_data_corr(
     j = 0
     n_theta_cont = 0
     for feat in cat_features:
-        if feat:   
+        if feat:
             if cat_kernel in [HOMO_GAUSSIAN, HOMO_HYP]:
                 theta_cont_features[
                     j : j + int(nlevels[i] * (nlevels[i] - 1) / 2)

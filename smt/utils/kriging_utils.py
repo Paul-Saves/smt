@@ -18,7 +18,7 @@ CONT_RELAX = "continuous_relaxation_matrix_kernel"
 GOWER_MAT = "gower_matrix_kernel"
 
 
-def standardization(X, y, scale_X_to_unit=False):
+def standardization(X, y, scale_X_to_unit=True):
 
     """
 
@@ -285,7 +285,7 @@ def compute_X_cont(x, xtypes):
     return x[:, np.logical_not(cat_features)], cat_features
 
 
-def gower_componentwise_distances(X, y=None, xtypes=None):
+def gower_componentwise_distances(X, y=None, xtypes=None,meta_distance=False):
     """
     Computes the nonzero Gower-distances componentwise between the vectors
     in X.
@@ -400,7 +400,19 @@ def gower_componentwise_distances(X, y=None, xtypes=None):
                 )
             except:
                 pass
-
+        if meta_distance ==True :
+            indD=0
+            for k1 in range(n_samples - 1):
+                for k2 in range(n_samples - k1- 1):
+                    l2 =k2+k1+1
+                    abs_delta = np.abs(X_num[k1] - Y_num[l2])/(np.sqrt(1+X_num[k1]**2)*np.sqrt(1+Y_num[l2]**2))
+                    D_num[indD]= np.divide(
+                        abs_delta,
+                        num_ranges,
+                        out=np.zeros_like(abs_delta),
+                        where=num_ranges != 0,
+                    )
+                    indD+=1
         n_samples, n_features = X_cat.shape
         n_nonzero_cross_dist = n_samples * (n_samples - 1) // 2
         D_cat = np.zeros((n_nonzero_cross_dist, n_features))
@@ -548,7 +560,8 @@ def matrix_data_corr(
     j = 0
     n_theta_cont = 0
     for feat in cat_features:
-        if feat:
+        if feat:   md=dx[:,0]
+    d_cont[md==1]= d_cont[md==1]*0
             if cat_kernel in [HOMO_GAUSSIAN, HOMO_HYP]:
                 theta_cont_features[
                     j : j + int(nlevels[i] * (nlevels[i] - 1) / 2)
@@ -621,6 +634,8 @@ def matrix_data_corr(
 
     theta_cont = theta[theta_cont_features[:, 0]]
     r_cont = _correlation_types[corr](theta_cont, d_cont)
+    md=dx[:,0]
+    d_cont[md==1]= d_cont[md==1]*0
     r_cat = np.copy(r_cont) * 0
     r = np.copy(r_cont)
     ##Theta_cat_i loop
@@ -739,7 +754,7 @@ def matrix_data_corr(
                         r_cat[k] = kval_cat
                     else:
                         r_cat[k] = T[indi, indj]
-
+                        r_cat[k] = np.exp(-theta[1]-theta[2]-theta[3])*T[indi,indj] 
         r = np.multiply(r, r_cat)
         if cat_kernel_comps is not None:
             if old_n_comp == None:

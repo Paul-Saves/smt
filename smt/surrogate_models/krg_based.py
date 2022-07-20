@@ -169,7 +169,7 @@ class KrgBased(SurrogateModel):
 
         if self.options["categorical_kernel"] is not None:
             D, self.ij, X = gower_componentwise_distances(
-                X=X, xtypes=self.options["xtypes"]
+                X=X, xtypes=self.options["xtypes"],meta_distance=True
             )
 
             if self.options["categorical_kernel"] in [
@@ -240,7 +240,7 @@ class KrgBased(SurrogateModel):
             self.optimal_par,
             self.optimal_theta,
         ) = self._optimize_hyperparam(D)
-
+        print(self.optimal_rlf_value)
         if self.name in ["MGP"]:
             self._specific_train()
         else:

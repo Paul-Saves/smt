@@ -632,9 +632,9 @@ def matrix_data_corr(
         return r
 
     theta_cont = theta[theta_cont_features[:, 0]]
-    r_cont = _correlation_types[corr](theta_cont, d_cont)
     md=dx[:,0]
     d_cont[md==1]= d_cont[md==1]*0
+    r_cont = _correlation_types[corr](theta_cont, d_cont)
     r_cat = np.copy(r_cont) * 0
     r = np.copy(r_cont)
     ##Theta_cat_i loop

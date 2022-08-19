@@ -759,10 +759,9 @@ class TestMixedInteger(unittest.TestCase):
         xt = np.concatenate((xt1, xt2, xt3), axis=0)
         xt[:, 1] = xt[:, 1].astype(np.float)
         yt1 = np.array([0.0, 9.0, 16.0])
-
-        yt2 = np.array([0.0, -4, -16.0])
-        yt3 = np.array([-9, 3, 11.0])
-
+        yt2 = np.array([0.0, -4, -13.0])
+        yt3 = np.array([-10, 3, 11.0])
+        
         yt = np.concatenate((yt1, yt2, yt3), axis=0)
         xlimits = [["Blue", "Red", "Green"], [0.0, 4.0]]
         xtypes = [(ENUM, 3), FLOAT]
@@ -807,7 +806,8 @@ class TestMixedInteger(unittest.TestCase):
         s2_2 = sm.predict_variances(x2)
         s2_3 = sm.predict_variances(x3)
 
-        fig, axs = plt.subplots(3)
+        fig, axs = plt.subplots(3, figsize=(8, 6))
+
         axs[0].plot(xt1[:, 1].astype(np.float), yt1, "o", linestyle="None")
         axs[0].plot(x_cont, y1, color="Blue")
         axs[0].fill_between(
@@ -821,7 +821,7 @@ class TestMixedInteger(unittest.TestCase):
         axs[0].legend(
             ["Training data", "Prediction", "Confidence Interval 99%"],
             loc="upper left",
-            bbox_to_anchor=[-0.5, 1],
+            bbox_to_anchor=[0, 1],
         )
         axs[1].plot(
             xt2[:, 1].astype(np.float), yt2, marker="o", color="r", linestyle="None"
@@ -838,7 +838,7 @@ class TestMixedInteger(unittest.TestCase):
         axs[1].legend(
             ["Training data", "Prediction", "Confidence Interval 99%"],
             loc="upper left",
-            bbox_to_anchor=[-0.5, 1],
+            bbox_to_anchor=[0, 1],
         )
         axs[2].plot(
             xt3[:, 1].astype(np.float), yt3, marker="o", color="r", linestyle="None"
@@ -855,11 +855,11 @@ class TestMixedInteger(unittest.TestCase):
         axs[2].legend(
             ["Training data", "Prediction", "Confidence Interval 99%"],
             loc="upper left",
-            bbox_to_anchor=[-0.5, 1],
+            bbox_to_anchor=[0, 1],
         )
-        plt.subplots_adjust(
-            left=0.01, bottom=0.01, right=0.99, top=0.99, wspace=0.5, hspace=0.02
-        )
+        plt.tight_layout()
+        plt.show()
+
 
     def test_mixed_homo_gaussian(self):
         import numpy as np
@@ -881,9 +881,8 @@ class TestMixedInteger(unittest.TestCase):
         xt = np.concatenate((xt1, xt2, xt3), axis=0)
         xt[:, 1] = xt[:, 1].astype(np.float)
         yt1 = np.array([0.0, 9.0, 16.0])
-
-        yt2 = np.array([0.0, -4, -16.0])
-        yt3 = np.array([-9, 3, 11.0])
+        yt2 = np.array([0.0, -4, -13.0])
+        yt3 = np.array([-10, 3, 11.0])
 
         yt = np.concatenate((yt1, yt2, yt3), axis=0)
         xlimits = [["Blue", "Red", "Green"], [0.0, 4.0]]
@@ -929,7 +928,8 @@ class TestMixedInteger(unittest.TestCase):
         s2_2 = sm.predict_variances(x2)
         s2_3 = sm.predict_variances(x3)
 
-        fig, axs = plt.subplots(3)
+        fig, axs = plt.subplots(3, figsize=(8, 6))
+
         axs[0].plot(xt1[:, 1].astype(np.float), yt1, "o", linestyle="None")
         axs[0].plot(x_cont, y1, color="Blue")
         axs[0].fill_between(
@@ -943,7 +943,7 @@ class TestMixedInteger(unittest.TestCase):
         axs[0].legend(
             ["Training data", "Prediction", "Confidence Interval 99%"],
             loc="upper left",
-            bbox_to_anchor=[-0.5, 1],
+            bbox_to_anchor=[0, 1],
         )
         axs[1].plot(
             xt2[:, 1].astype(np.float), yt2, marker="o", color="r", linestyle="None"
@@ -960,7 +960,7 @@ class TestMixedInteger(unittest.TestCase):
         axs[1].legend(
             ["Training data", "Prediction", "Confidence Interval 99%"],
             loc="upper left",
-            bbox_to_anchor=[-0.5, 1],
+            bbox_to_anchor=[0, 1],
         )
         axs[2].plot(
             xt3[:, 1].astype(np.float), yt3, marker="o", color="r", linestyle="None"
@@ -977,11 +977,10 @@ class TestMixedInteger(unittest.TestCase):
         axs[2].legend(
             ["Training data", "Prediction", "Confidence Interval 99%"],
             loc="upper left",
-            bbox_to_anchor=[-0.5, 1],
+            bbox_to_anchor=[0, 1],
         )
-        plt.subplots_adjust(
-            left=0.01, bottom=0.01, right=0.99, top=0.99, wspace=0.5, hspace=0.02
-        )
+        plt.tight_layout()
+        plt.show()
 
     def test_mixed_homo_hyp(self):
         import numpy as np
@@ -1003,9 +1002,8 @@ class TestMixedInteger(unittest.TestCase):
         xt = np.concatenate((xt1, xt2, xt3), axis=0)
         xt[:, 1] = xt[:, 1].astype(np.float)
         yt1 = np.array([0.0, 9.0, 16.0])
-
-        yt2 = np.array([0.0, -4, -16.0])
-        yt3 = np.array([-9, 3, 11.0])
+        yt2 = np.array([0.0, -4, -13.0])
+        yt3 = np.array([-10, 3, 11.0])
 
         yt = np.concatenate((yt1, yt2, yt3), axis=0)
         xlimits = [["Blue", "Red", "Green"], [0.0, 4.0]]
@@ -1051,7 +1049,8 @@ class TestMixedInteger(unittest.TestCase):
         s2_2 = sm.predict_variances(x2)
         s2_3 = sm.predict_variances(x3)
 
-        fig, axs = plt.subplots(3)
+        fig, axs = plt.subplots(3, figsize=(8, 6))
+
         axs[0].plot(xt1[:, 1].astype(np.float), yt1, "o", linestyle="None")
         axs[0].plot(x_cont, y1, color="Blue")
         axs[0].fill_between(
@@ -1065,7 +1064,7 @@ class TestMixedInteger(unittest.TestCase):
         axs[0].legend(
             ["Training data", "Prediction", "Confidence Interval 99%"],
             loc="upper left",
-            bbox_to_anchor=[-0.5, 1],
+            bbox_to_anchor=[0, 1],
         )
         axs[1].plot(
             xt2[:, 1].astype(np.float), yt2, marker="o", color="r", linestyle="None"
@@ -1082,7 +1081,7 @@ class TestMixedInteger(unittest.TestCase):
         axs[1].legend(
             ["Training data", "Prediction", "Confidence Interval 99%"],
             loc="upper left",
-            bbox_to_anchor=[-0.5, 1],
+            bbox_to_anchor=[0, 1],
         )
         axs[2].plot(
             xt3[:, 1].astype(np.float), yt3, marker="o", color="r", linestyle="None"
@@ -1099,11 +1098,10 @@ class TestMixedInteger(unittest.TestCase):
         axs[2].legend(
             ["Training data", "Prediction", "Confidence Interval 99%"],
             loc="upper left",
-            bbox_to_anchor=[-0.5, 1],
+            bbox_to_anchor=[0, 1],
         )
-        plt.subplots_adjust(
-            left=0.01, bottom=0.01, right=0.99, top=0.99, wspace=0.5, hspace=0.02
-        )
+        plt.tight_layout()
+        plt.show()
 
 
 if __name__ == "__main__":

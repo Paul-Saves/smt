@@ -18,6 +18,7 @@ from smt.applications.mixed_integer import (
     MixedIntegerContext,
     GOWER_KERNEL,
     EXP_HOMO_HSPHERE_KERNEL,
+    HOMO_HSPHERE_KERNEL,
     CONT_RELAX_KERNEL,
 )
 from smt.utils.misc import compute_rms_error

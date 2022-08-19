@@ -113,7 +113,12 @@ class EGO(SurrogateBasedApplication):
         declare(
             "categorical_kernel",
             None,
-            values=[GOWER_KERNEL, EXP_HOMO_HSPHERE_KERNEL,HOMO_HSPHERE_KERNEL, CONT_RELAX_KERNEL],
+            values=[
+                GOWER_KERNEL,
+                EXP_HOMO_HSPHERE_KERNEL,
+                HOMO_HSPHERE_KERNEL,
+                CONT_RELAX_KERNEL,
+            ],
             desc="The kernel to use for categorical inputs. Only for non continuous Kriging.",
         )
         declare(

@@ -77,7 +77,12 @@ class KrgBased(SurrogateModel):
         declare(
             "categorical_kernel",
             None,
-            values=[CONT_RELAX_KERNEL, GOWER_KERNEL, EXP_HOMO_HSPHERE_KERNEL, HOMO_HSPHERE_KERNEL],
+            values=[
+                CONT_RELAX_KERNEL,
+                GOWER_KERNEL,
+                EXP_HOMO_HSPHERE_KERNEL,
+                HOMO_HSPHERE_KERNEL,
+            ],
             desc="The kernel to use for categorical inputs. Only for non continuous Kriging",
         )
 
@@ -172,9 +177,7 @@ class KrgBased(SurrogateModel):
             self.Lij, self.n_levels = cross_levels(
                 X=self.X_train, ij=self.ij, xtypes=self.options["xtypes"]
             )
-            _, self.cat_features = compute_X_cont(
-                self.X_train, self.options["xtypes"]
-            )
+            _, self.cat_features = compute_X_cont(self.X_train, self.options["xtypes"])
         # Center and scale X and y
         (
             self.X_norma,
@@ -1123,7 +1126,7 @@ class KrgBased(SurrogateModel):
                 )
                 theta0 = np.log10(self.theta0)
 
-            if self.options["categorical_kernel"] :
+            if self.options["categorical_kernel"]:
                 self.D = D
             else:
                 ##from abs distance to kernel distance
@@ -1319,7 +1322,8 @@ class KrgBased(SurrogateModel):
                     "KPLS only works with a squared exponential or an absolute exponential kernel"
                 )
             if (
-                self.options["categorical_kernel"] not in [EXP_HOMO_HSPHERE_KERNEL, HOMO_HSPHERE_KERNEL]
+                self.options["categorical_kernel"]
+                not in [EXP_HOMO_HSPHERE_KERNEL, HOMO_HSPHERE_KERNEL]
                 and self.name == "KPLS"
             ):
                 if self.options["cat_kernel_comps"] is not None:

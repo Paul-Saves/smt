@@ -761,7 +761,7 @@ class TestMixedInteger(unittest.TestCase):
         yt1 = np.array([0.0, 9.0, 16.0])
         yt2 = np.array([0.0, -4, -13.0])
         yt3 = np.array([-10, 3, 11.0])
-        
+
         yt = np.concatenate((yt1, yt2, yt3), axis=0)
         xlimits = [["Blue", "Red", "Green"], [0.0, 4.0]]
         xtypes = [(ENUM, 3), FLOAT]
@@ -859,7 +859,6 @@ class TestMixedInteger(unittest.TestCase):
         )
         plt.tight_layout()
         plt.show()
-
 
     def test_mixed_homo_gaussian(self):
         import numpy as np

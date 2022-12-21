@@ -173,7 +173,9 @@ class KrgBased(SurrogateModel):
 
         if self.options["categorical_kernel"] is not None:
             D, self.ij, X = gower_componentwise_distances(
-                X=X, xtypes=self.options["xtypes"]
+                X=X, 
+                xtypes=self.options["xtypes"],
+                meta_distance=True,
             )
             self.Lij, self.n_levels = cross_levels(
                 X=self.X_train, ij=self.ij, xtypes=self.options["xtypes"]
@@ -237,6 +239,7 @@ class KrgBased(SurrogateModel):
             self.optimal_par,
             self.optimal_theta,
         ) = self._optimize_hyperparam(D)
+        print(self.optimal_rlf_value)
         if self.name in ["MGP"]:
             self._specific_train()
         else:
@@ -397,6 +400,8 @@ class KrgBased(SurrogateModel):
         if cat_kernel == CONT_RELAX_KERNEL or cat_kernel == GOWER_KERNEL:
             r = _correlation_types[corr](theta, d)
             return r
+        #md = dx[:, 0]
+        #d_cont[md == 1,1] = d_cont[md == 1,1] * 0
 
         theta_cont = theta[theta_cont_features[:, 0]]
         r_cont = _correlation_types[corr](theta_cont, d_cont)
@@ -514,7 +519,6 @@ class KrgBased(SurrogateModel):
                             r_cat[k] = kval_cat
                         else:
                             r_cat[k] = T[indi, indj]
-
             r = np.multiply(r, r_cat)
             if cat_kernel_comps is not None:
                 if old_n_comp == None:
@@ -619,7 +623,7 @@ class KrgBased(SurrogateModel):
             C = linalg.cholesky(R, lower=True)
         except (linalg.LinAlgError, ValueError) as e:
             print("exception : ", e)
-            print(np.linalg.eig(R)[0])
+            print(min(np.linalg.eig(R)[0]))
             return reduced_likelihood_function_value, par
 
         # Get generalized least squared solution

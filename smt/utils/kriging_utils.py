@@ -12,7 +12,7 @@ from pyDOE2 import bbdesign
 from sklearn.metrics.pairwise import check_pairwise_arrays
 
 
-def standardization(X, y, scale_X_to_unit=False):
+def standardization(X, y, scale_X_to_unit=True):
 
     """
 
@@ -238,7 +238,7 @@ def compute_X_cont(x, xtypes):
     return x[:, np.logical_not(cat_features)], cat_features
 
 
-def gower_componentwise_distances(X, y=None, xtypes=None):
+def gower_componentwise_distances(X, y=None, xtypes=None,meta_distance=False):
     """
     Computes the nonzero Gower-distances componentwise between the vectors
     in X.
@@ -297,9 +297,10 @@ def gower_componentwise_distances(X, y=None, xtypes=None):
     num_max = np.zeros(num_cols)
 
     for col in range(num_cols):
+
         col_array = Y_num[:, col].astype(np.float64)
-        max = np.nanmax(col_array)
-        min = np.nanmin(col_array)
+        max = np.nanmax([np.abs(np.nanmax(col_array)),np.abs(np.nanmin(col_array))])
+        min = np.nanmin([np.abs(np.nanmax(col_array)),np.abs(np.nanmin(col_array))])
 
         if np.isnan(max):
             max = 0.0
@@ -307,6 +308,7 @@ def gower_componentwise_distances(X, y=None, xtypes=None):
             min = 0.0
         num_max[col] = max
         num_ranges[col] = (1 - min / max) if (max != 0) else 0.0
+        num_ranges[col] = 1
 
     # This is to normalize the numeric values between 0 and 1.
     Z_num = np.divide(Z_num, num_max, out=np.zeros_like(Z_num), where=num_max != 0)
@@ -353,7 +355,40 @@ def gower_componentwise_distances(X, y=None, xtypes=None):
                 )
             except:
                 pass
+        if meta_distance == True:
+            indD = 0
+            for k1 in range(n_samples - 1):
+                for k2 in range(n_samples - k1 - 1):
+                    l2 = k2 + k1 + 1
+                    
+                    abs_delta = (np.abs(X_num[k1] - Y_num[l2]))
+                    
+                    ## I should have here the decreed continuous dimensions
+                    abs_delta[4:7] = (
+                        2
+                        * np.abs(X_num[k1][4:7] - Y_num[l2][4:7])
+                        / (np.sqrt(1 + X_num[k1][4:7] ** 2) * np.sqrt(1 + Y_num[l2][4:7] ** 2))
+                    )
+            #        abs_delta = (
+             #           np.sqrt(2)
+              #          * np.sqrt(1 - np.cos(np.pi/2*np.abs(X_num[k1] - Y_num[l2])) )
+               #     )
+                    
+                    #This is the meta variable index
+                    minmeta=int(np.round(2*np.min([X_num[k1][0],X_num[l2][0]])))
+                    maxmeta=int(np.round(2*np.max([X_num[k1][0],X_num[l2][0]])))                    
 
+                    
+                    abs_delta[minmeta+5:] = (abs_delta[minmeta+5:]*0+1)
+                    abs_delta[maxmeta+5:] = abs_delta[maxmeta+5:]*0                    
+                    
+                    D_num[indD] = np.divide(
+                        abs_delta,
+                        num_ranges,
+                        out=np.zeros_like(abs_delta),
+                        where=num_ranges != 0,
+                    )
+                    indD += 1
         n_samples, n_features = X_cat.shape
         n_nonzero_cross_dist = n_samples * (n_samples - 1) // 2
         D_cat = np.zeros((n_nonzero_cross_dist, n_features))
@@ -384,7 +419,6 @@ def gower_componentwise_distances(X, y=None, xtypes=None):
             out=np.zeros_like(D[:, np.logical_not(cat_features)]),
             where=num_ranges != 0,
         )
-
         return D
 
 

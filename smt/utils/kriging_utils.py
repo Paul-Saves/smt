@@ -292,7 +292,6 @@ def gower_componentwise_distances(X, xlimits, y=None, xtypes=None, meta_distance
     y_index = range(x_n_rows, x_n_rows + y_n_rows)
 
     Z_num = Z[:, np.logical_not(cat_features)]
-    Y_num = Y[:, np.logical_not(cat_features)]
 
     # This is to normalize the numeric values between 0 and 1.
     lim = np.atleast_2d(np.array(xlimits, dtype=object)[np.logical_not(cat_features)])
@@ -322,8 +321,8 @@ def gower_componentwise_distances(X, xlimits, y=None, xtypes=None, meta_distance
         y_index,
     ]
 
-    X_norma = X
-    Y_norma = Y
+    X_norma = np.copy(X)
+    Y_norma = np.copy(Y)
     X_norma[:, np.logical_not(cat_features)] = X_num
     Y_norma[:, np.logical_not(cat_features)] = Y_num
 
@@ -362,6 +361,8 @@ def gower_componentwise_distances(X, xlimits, y=None, xtypes=None, meta_distance
                         #           np.sqrt(2)
                         #          * np.sqrt(1 - np.cos(np.pi/2*np.abs(X_num[k1] - Y_num[l2])) )
                         #     )
+                        if abs_delta[0] > 0 :
+                            print(abs_delta[0],X[:, np.logical_not(cat_features)][k1][0],Y[:, np.logical_not(cat_features)][l2][0])
 
                         # This is the meta variable index
                         minmeta = int(

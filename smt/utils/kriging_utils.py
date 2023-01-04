@@ -238,7 +238,7 @@ def compute_X_cont(x, xtypes):
     return x[:, np.logical_not(cat_features)], cat_features
 
 
-def gower_componentwise_distances(X, xlimits, y=None, xtypes=None, meta_distance=False):
+def gower_componentwise_distances(X, xlimits, y=None, xtypes=None,xroles = None, meta_distance=False):
     """
     Computes the nonzero Gower-distances componentwise between the vectors
     in X.
@@ -252,6 +252,8 @@ def gower_componentwise_distances(X, xlimits, y=None, xtypes=None, meta_distance
             - The upper and lower var bounds.
     xtypes: np.ndarray [dim]
             -the types (FLOAT,ORD,ENUM) of the input variables
+    xroles: np.ndarray [dim]
+            -the roles (NEUTRAL,META,DECREED) of the input variables
     Returns
     -------
     D: np.ndarray [n_obs * (n_obs - 1) / 2, dim]

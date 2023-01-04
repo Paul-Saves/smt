@@ -186,6 +186,7 @@ class KrgBased(SurrogateModel):
                 X=X,
                 xlimits=self.options["xlimits"],
                 xtypes=self.options["xtypes"],
+                xroles=self.options["xroles"],
                 meta_distance=True,
             )
             self.Lij, self.n_levels = cross_levels(
@@ -1024,6 +1025,7 @@ class KrgBased(SurrogateModel):
                 y=np.copy(self.X_train),
                 xlimits=self.options["xlimits"],
                 xtypes=self.options["xtypes"],
+                xroles=self.options["xroles"],
             )
 
             d = componentwise_distance(
@@ -1162,6 +1164,7 @@ class KrgBased(SurrogateModel):
                 y=np.copy(self.X_train),
                 xlimits=self.options["xlimits"],
                 xtypes=self.options["xtypes"],
+                xroles=self.options["xroles"],
             )
             d = componentwise_distance(
                 dx,

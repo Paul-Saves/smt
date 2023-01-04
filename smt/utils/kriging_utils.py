@@ -361,8 +361,6 @@ def gower_componentwise_distances(X, xlimits, y=None, xtypes=None, meta_distance
                         #           np.sqrt(2)
                         #          * np.sqrt(1 - np.cos(np.pi/2*np.abs(X_num[k1] - Y_num[l2])) )
                         #     )
-                        if abs_delta[0] > 0 :
-                            print(abs_delta[0],X[:, np.logical_not(cat_features)][k1][0],Y[:, np.logical_not(cat_features)][l2][0])
 
                         # This is the meta variable index
                         minmeta = int(
@@ -372,8 +370,10 @@ def gower_componentwise_distances(X, xlimits, y=None, xtypes=None, meta_distance
                             np.round(2 * np.max([X_num[k1][0], X_num[l2][0]]))
                         )
 
-                        abs_delta[minmeta + 5 :] = abs_delta[minmeta + 5 :] * 0 + 1
-                        abs_delta[maxmeta + 5 :] = abs_delta[maxmeta + 5 :] * 0
+                        abs_delta[minmeta + 4 + 1 :] = (
+                            abs_delta[minmeta + 4 + 1 :] * 0 + 1
+                        )
+                        abs_delta[maxmeta + 4 + 1 :] = abs_delta[maxmeta + 4 + 1 :] * 0
 
                         D_num[indD] = abs_delta
                         indD += 1

@@ -95,8 +95,14 @@ class KrgBased(SurrogateModel):
             "xtypes",
             None,
             types=list,
-            desc="x type specifications: either FLOAT for continuous, INT for integer "
+            desc="x types specifications: either FLOAT for continuous, INT for integer "
             "or (ENUM n) for categorical dimension with n levels",
+        )
+        declare(
+            "xroles",
+            None,
+            types=list,
+            desc="x roles specifications: either NEUTRAL for neutral variables, META for the meta variables and DECREED for the decreed ones",
         )
         declare(
             "nugget",

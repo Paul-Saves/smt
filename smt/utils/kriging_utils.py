@@ -306,11 +306,11 @@ def gower_componentwise_distances(
     Z_num = Z[:, np.logical_not(cat_features)]
 
     # This is to normalize the numeric values between 0 and 1.
-    lim = np.atleast_2d(np.array(xlimits, dtype=object)[np.logical_not(cat_features)])
-    lb = np.zeros(np.shape(lim)[1])
-    ub = np.ones(np.shape(lim)[1])
+    lim = np.array(xlimits, dtype=object)[np.logical_not(cat_features)]
+    lb = np.zeros(np.shape(lim)[0])
+    ub = np.ones(np.shape(lim)[0])
     if np.shape(lim)[0] > 0:
-        for k, i in enumerate(lim[0]):        
+        for k, i in enumerate(lim):        
             if (xroles is None) or (xroles[k] != "meta_role") :
                 lb[k] = i[0]
                 ub[k] = i[-1]
@@ -382,7 +382,7 @@ def gower_componentwise_distances(
                         abs_delta[minmeta + ind_dec + 1 :] = (
                             abs_delta[minmeta + ind_dec + 1 :] * 0 + 1
                         )
-                        abs_delta[maxmeta + ind_dec + 1 :] = abs_delta[maxmeta + 4 + 1 :] * 0
+                        abs_delta[maxmeta + ind_dec + 1 :] = abs_delta[maxmeta + ind_dec + 1 :] * 0
 
                         D_num[indD] = abs_delta
                         indD += 1

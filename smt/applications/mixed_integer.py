@@ -26,7 +26,7 @@ class MixedIntegerSamplingMethod(SamplingMethod):
     handling integer (ORD) or categorical (ENUM) features
     """
 
-    def __init__(self, xtypes, xroles, xlimits, sampling_method_class, **kwargs):
+    def __init__(self, xtypes, xlimits, sampling_method_class, xroles=None, **kwargs):
         """
         Parameters
         ----------
@@ -80,9 +80,9 @@ class MixedIntegerSurrogateModel(SurrogateModel):
     def __init__(
         self,
         xtypes,
-        xroles,
         xlimits,
         surrogate,
+        xroles= None,
         input_in_folded_space=True,
         categorical_kernel=None,
         cat_kernel_comps=None,
@@ -202,8 +202,8 @@ class MixedIntegerContext(object):
     def __init__(
         self,
         xtypes,
-        xroles,
         xlimits,
+        xroles = None,
         work_in_folded_space=True,
         categorical_kernel=None,
         cat_kernel_comps=None,

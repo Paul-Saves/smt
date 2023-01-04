@@ -268,6 +268,15 @@ def gower_componentwise_distances(
     X = X.astype(np.float64)
     Xt = X
     X_cont, cat_features = compute_X_cont(Xt, xtypes)
+    if xroles is not None :
+        decreed_features = np.array([
+             (xrole == "decreed_role") for xrole in xroles
+        ])
+        meta_features = np.array([
+             (xrole == "meta_role") for xrole in xroles
+        ])
+        decreed_num_features = decreed_features[np.logical_not(cat_features)]
+        meta_num_features = meta_features[np.logical_not(cat_features)]
 
     # function checks
     if y is None:
@@ -301,8 +310,8 @@ def gower_componentwise_distances(
     lb = np.zeros(np.shape(lim)[1])
     ub = np.ones(np.shape(lim)[1])
     if np.shape(lim)[0] > 0:
-        for k, i in enumerate(lim[0]):
-            if xroles[k] != "meta_role":
+        for k, i in enumerate(lim[0]):        
+            if (xroles is None) or (xroles[k] != "meta_role") :
                 lb[k] = i[0]
                 ub[k] = i[-1]
         Z_offset = lb
@@ -353,12 +362,12 @@ def gower_componentwise_distances(
                         abs_delta = np.abs(X_num[k1] - Y_num[l2])
 
                         ## I should have here the decreed continuous dimensions
-                        abs_delta[4:7] = (
+                        abs_delta[decreed_num_features] = (
                             2
-                            * np.abs(X_num[k1][4:7] - Y_num[l2][4:7])
+                            * np.abs(X_num[k1][decreed_num_features] - Y_num[l2][decreed_num_features])
                             / (
-                                np.sqrt(1 + X_num[k1][4:7] ** 2)
-                                * np.sqrt(1 + Y_num[l2][4:7] ** 2)
+                                np.sqrt(1 + X_num[k1][decreed_num_features] ** 2)
+                                * np.sqrt(1 + Y_num[l2][decreed_num_features] ** 2)
                             )
                         )
                         #        abs_delta = (
@@ -367,13 +376,13 @@ def gower_componentwise_distances(
                         #     )
 
                         # This is the meta variable index
-                        minmeta = int(np.min([X_num[k1][0], X_num[l2][0]]))
-                        maxmeta = int(np.max([X_num[k1][0], X_num[l2][0]]))
-
-                        abs_delta[minmeta + 4 + 1 :] = (
-                            abs_delta[minmeta + 4 + 1 :] * 0 + 1
+                        minmeta = int(np.min([X_num[k1][meta_num_features], X_num[l2][meta_num_features]]))
+                        maxmeta = int(np.max([X_num[k1][meta_num_features], X_num[l2][meta_num_features]]))
+                        ind_dec = min((decreed_num_features).nonzero()[0])
+                        abs_delta[minmeta + ind_dec + 1 :] = (
+                            abs_delta[minmeta + ind_dec + 1 :] * 0 + 1
                         )
-                        abs_delta[maxmeta + 4 + 1 :] = abs_delta[maxmeta + 4 + 1 :] * 0
+                        abs_delta[maxmeta + ind_dec + 1 :] = abs_delta[maxmeta + 4 + 1 :] * 0
 
                         D_num[indD] = abs_delta
                         indD += 1

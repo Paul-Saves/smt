@@ -232,13 +232,14 @@ def compute_X_cont(x, xtypes):
     if xtypes is None:
         return x, None
     cat_features = [
-        not (xtype == "float_type" or xtype == "ord_type")
-        for i, xtype in enumerate(xtypes)
+        not (xtype == "float_type" or xtype == "ord_type") for xtype in xtypes
     ]
     return x[:, np.logical_not(cat_features)], cat_features
 
 
-def gower_componentwise_distances(X, xlimits, y=None, xtypes=None,xroles = None, meta_distance=False):
+def gower_componentwise_distances(
+    X, xlimits, y=None, xtypes=None, xroles=None, meta_distance=False
+):
     """
     Computes the nonzero Gower-distances componentwise between the vectors
     in X.
@@ -298,11 +299,12 @@ def gower_componentwise_distances(X, xlimits, y=None, xtypes=None,xroles = None,
     # This is to normalize the numeric values between 0 and 1.
     lim = np.atleast_2d(np.array(xlimits, dtype=object)[np.logical_not(cat_features)])
     lb = np.zeros(np.shape(lim)[1])
-    ub = np.zeros(np.shape(lim)[1])
+    ub = np.ones(np.shape(lim)[1])
     if np.shape(lim)[0] > 0:
         for k, i in enumerate(lim[0]):
-            lb[k] = i[0]
-            ub[k] = i[-1]
+            if xroles[k] != "meta_role":
+                lb[k] = i[0]
+                ub[k] = i[-1]
         Z_offset = lb
         Z_max = ub
         Z_scale = Z_max - Z_offset
@@ -365,12 +367,8 @@ def gower_componentwise_distances(X, xlimits, y=None, xtypes=None,xroles = None,
                         #     )
 
                         # This is the meta variable index
-                        minmeta = int(
-                            np.round(2 * np.min([X_num[k1][0], X_num[l2][0]]))
-                        )
-                        maxmeta = int(
-                            np.round(2 * np.max([X_num[k1][0], X_num[l2][0]]))
-                        )
+                        minmeta = int(np.min([X_num[k1][0], X_num[l2][0]]))
+                        maxmeta = int(np.max([X_num[k1][0], X_num[l2][0]]))
 
                         abs_delta[minmeta + 4 + 1 :] = (
                             abs_delta[minmeta + 4 + 1 :] * 0 + 1

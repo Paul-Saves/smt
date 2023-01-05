@@ -104,7 +104,7 @@ xdoe2[:, 0] = np.ones(108)
 xdoe2[:, 1:4] = x_cont
 
 
-xdoe3 = np.zeros((81, 5))
+xdoe3 = np.zeros((648, 5))
 
 x_cont = np.linspace(0, 5, 6)
 u = []
@@ -113,9 +113,9 @@ w = []
 x = []
 
 for (xi, yi, zi, ai) in itertools.product(
-    np.linspace(0, 5, 3),
-    np.linspace(0, 5, 3),
-    np.linspace(0, 5, 3),
+    np.linspace(0, 5, 6),
+    np.linspace(0, 5, 6),
+    np.linspace(0, 5, 6),
     np.linspace(-5, -2, 3),
 ):
     u.append(xi)
@@ -131,7 +131,7 @@ x_cont = np.concatenate(
     ),
     axis=1,
 )
-xdoe3[:, 0] = 2 * np.ones(81)
+xdoe3[:, 0] = 2 * np.ones(648)
 xdoe3[:, 1:5] = x_cont
 ydoe3 = f(xdoe3)
 
@@ -147,7 +147,7 @@ sm = MixedIntegerSurrogateModel(
     xtypes=xtypes,
     xlimits=xlimits,
     xroles=xroles,
-    surrogate=KRG(theta0=[1e-2], n_start=5, corr="abs_exp"),
+    surrogate=KRG(theta0=[1e-2], n_start=30, corr="abs_exp"),
 )
 sm.set_training_values(Xt, Yt)
 a = time.time()

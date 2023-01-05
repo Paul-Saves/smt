@@ -12,7 +12,7 @@ from pyDOE2 import bbdesign
 from sklearn.metrics.pairwise import check_pairwise_arrays
 
 
-def standardization(X, y, scale_X_to_unit=True):
+def standardization(X, y, scale_X_to_unit=False):
 
     """
 

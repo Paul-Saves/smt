@@ -305,9 +305,10 @@ def gower_componentwise_distances(X, xlimits, y=None, xtypes=None, xroles=None):
     ub = np.ones(np.shape(lim)[0])
     if np.shape(lim)[0] > 0:
         for k, i in enumerate(lim):
-            if (xroles is None) or (xroles[k] != "meta_role"):
+    if (xroles is None) or (xroles[k] != "meta_role"):
                 lb[k] = i[0]
                 ub[k] = i[-1]
+
         Z_offset = lb
         Z_max = ub
         Z_scale = Z_max - Z_offset

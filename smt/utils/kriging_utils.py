@@ -381,12 +381,10 @@ def gower_componentwise_distances(
                         )
                     )
                     ind_dec = min((decreed_num_features).nonzero()[0])
-                    abs_delta[minmeta + ind_dec + 1 :] = (
-                        abs_delta[minmeta + ind_dec + 1 :] * 0 + 1
+                    abs_delta[minmeta + ind_dec :] = (
+                        abs_delta[minmeta + ind_dec :] * 0 + 1
                     )
-                    abs_delta[maxmeta + ind_dec + 1 :] = (
-                        abs_delta[maxmeta + ind_dec + 1 :] * 0
-                    )
+                    abs_delta[maxmeta + ind_dec :] = abs_delta[maxmeta + ind_dec :] * 0
 
                     D_num[indD] = abs_delta
                     indD += 1

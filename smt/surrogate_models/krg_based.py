@@ -185,7 +185,6 @@ class KrgBased(SurrogateModel):
                 xlimits=self.options["xlimits"],
                 xtypes=self.options["xtypes"],
                 xroles=self.options["xroles"],
-                meta_distance=True,
             )
             self.Lij, self.n_levels = cross_levels(
                 X=self.X_train, ij=self.ij, xtypes=self.options["xtypes"]

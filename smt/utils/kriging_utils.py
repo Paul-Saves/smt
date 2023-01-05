@@ -237,9 +237,7 @@ def compute_X_cont(x, xtypes):
     return x[:, np.logical_not(cat_features)], cat_features
 
 
-def gower_componentwise_distances(
-    X, xlimits, y=None, xtypes=None, xroles=None, meta_distance=False
-):
+def gower_componentwise_distances(X, xlimits, y=None, xtypes=None, xroles=None):
     """
     Computes the nonzero Gower-distances componentwise between the vectors
     in X.
@@ -341,7 +339,7 @@ def gower_componentwise_distances(
     D_num = np.zeros((n_nonzero_cross_dist, n_features))
     ll_1 = 0
     if y is None:
-        if meta_distance == True:
+        if xroles is not None:
             indD = 0
             for k1 in range(n_samples - 1):
                 ll_0 = ll_1

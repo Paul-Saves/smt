@@ -22,6 +22,9 @@ from smt.surrogate_models import (
 from smt.applications.mixed_integer import (
     MixedIntegerSurrogateModel,
 )
+import time
+
+
 def f_neu(x1):
 
     return 2 * x1
@@ -137,16 +140,20 @@ Yt = np.concatenate((ydoe1, ydoe2, ydoe3), axis=0)
 
 xlimits = [[0, 2], [-5, -2], [0.0, 5.0], [0.0, 5.0], [0.0, 5.0]]
 xtypes = [ORD, FLOAT, ORD, ORD, ORD]
-xroles = [META,NEUTRAL,DECREED,DECREED,DECREED]
+xroles = [META, NEUTRAL, DECREED, DECREED, DECREED]
 # Surrogate
 sm = MixedIntegerSurrogateModel(
     categorical_kernel=HOMO_HSPHERE_KERNEL,
     xtypes=xtypes,
     xlimits=xlimits,
-    xroles= xroles,
+    xroles=xroles,
     surrogate=KRG(theta0=[1e-2], n_start=5, corr="abs_exp"),
 )
 sm.set_training_values(Xt, Yt)
+a = time.time()
 sm.train()
+b = time.time()
+t = b - a
+print(t)
 
 print(sm._surrogate.optimal_theta)

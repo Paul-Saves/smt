@@ -338,28 +338,39 @@ def gower_componentwise_distances(X, xlimits, y=None, xtypes=None, xroles=None):
     D = np.abs(D)
     D[:, cat_features] = D[:, cat_features] > 0.5
 
+    n_samples, n_features = X_cat.shape
+    n_nonzero_cross_dist = n_samples * (n_samples - 1) // 2
+    D_cat = np.zeros((n_nonzero_cross_dist, n_features))
+    ll_1 = 0
+    
+    for k1 in range(n_samples - 1):
+        ll_0 = ll_1
+        ll_1 = ll_0 + n_samples - k1 - 1
+        D_cat[ll_0:ll_1] = np.where(
+            X_cat[k1] == Y_cat[(k1 + 1) : n_samples],
+            np.zeros_like(X_cat[k1]),
+            np.ones_like(X_cat[k1]),
+        )
+    n_samples, n_features = X_num.shape
+    n_nonzero_cross_dist = n_samples * (n_samples - 1) // 2
+    ij = np.zeros((n_nonzero_cross_dist, 2), dtype=np.int32)
+    D_num = np.zeros((n_nonzero_cross_dist, n_features))
+    ll_1 = 0
+    for k1 in range(n_samples - 1):
+        ll_0 = ll_1
+        ll_1 = ll_0 + n_samples - k1 - 1
+        ij[ll_0:ll_1, 0] = k1
+        ij[ll_0:ll_1, 1] = np.arange(k1 + 1, n_samples)
+        abs_delta = np.abs(X_num[k1] - Y_num[(k1 + 1) : n_samples])
+        D_num[ll_0:ll_1] = abs_delta
+
+    D = np.concatenate((D_cat, D_num), axis=1) * 0
+    D[:, np.logical_not(cat_features)] = D_num
+    D[:, cat_features] = D_cat
+
     if y is not None:
         return D
     else:
-        n_samples, n_features = X_cat.shape
-        n_nonzero_cross_dist = n_samples * (n_samples - 1) // 2
-        D_cat = np.zeros((n_nonzero_cross_dist, n_features))
-        ll_1 = 0
-
-        for k1 in range(n_samples - 1):
-            ll_0 = ll_1
-            ll_1 = ll_0 + n_samples - k1 - 1
-            D_cat[ll_0:ll_1] = np.where(
-                X_cat[k1] == Y_cat[(k1 + 1) : n_samples],
-                np.zeros_like(X_cat[k1]),
-                np.ones_like(X_cat[k1]),
-            )
-
-        n_samples, n_features = X_num.shape
-        n_nonzero_cross_dist = n_samples * (n_samples - 1) // 2
-        ij = np.zeros((n_nonzero_cross_dist, 2), dtype=np.int32)
-        D_num = np.zeros((n_nonzero_cross_dist, n_features))
-        ll_1 = 0
         if xroles is not None:
             indD = 0
             for k1 in range(n_samples - 1):
@@ -407,19 +418,6 @@ def gower_componentwise_distances(X, xlimits, y=None, xtypes=None, xroles=None):
 
                     D_num[indD] = abs_delta
                     indD += 1
-        else:
-            for k1 in range(n_samples - 1):
-                ll_0 = ll_1
-                ll_1 = ll_0 + n_samples - k1 - 1
-                ij[ll_0:ll_1, 0] = k1
-                ij[ll_0:ll_1, 1] = np.arange(k1 + 1, n_samples)
-                abs_delta = np.abs(X_num[k1] - Y_num[(k1 + 1) : n_samples])
-                D_num[ll_0:ll_1] = abs_delta
-
-        D = np.concatenate((D_cat, D_num), axis=1) * 0
-        D[:, np.logical_not(cat_features)] = D_num
-        D[:, cat_features] = D_cat
-
         return D, ij.astype(np.int32), X_cont
 
 

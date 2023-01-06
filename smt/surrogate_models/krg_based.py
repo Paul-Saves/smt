@@ -1024,7 +1024,6 @@ class KrgBased(SurrogateModel):
                 xtypes=self.options["xtypes"],
                 xroles=self.options["xroles"],
             )
-
             d = componentwise_distance(
                 dx,
                 self.options["corr"],

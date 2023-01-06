@@ -303,11 +303,14 @@ def gower_componentwise_distances(X, xlimits, y=None, xtypes=None, xroles=None):
     lim = np.array(xlimits, dtype=object)[np.logical_not(cat_features)]
     lb = np.zeros(np.shape(lim)[0])
     ub = np.ones(np.shape(lim)[0])
+    maxmetanum=1
     if np.shape(lim)[0] > 0:
         for k, i in enumerate(lim):
             if (xroles is None) or (xroles[k] != "meta_role"):
                 lb[k] = i[0]
                 ub[k] = i[-1]
+            else : 
+                maxmetanum = i[-1]
 
         Z_offset = lb
         Z_max = ub
@@ -389,18 +392,19 @@ def gower_componentwise_distances(X, xlimits, y=None, xtypes=None, xroles=None):
                     / (
                         np.sqrt(1 + X_num[k1][decreed_num_features] ** 2)
                         * np.sqrt(1 + Y_num[l2][decreed_num_features] ** 2)
-                    )
-                )
+                    ))
+                abs_delta[meta_num_features] =  abs_delta[meta_num_features]/maxmetanum
+
                 #        abs_delta = (
                 #           np.sqrt(2)
                 #          * np.sqrt(1 - np.cos(np.pi/2*np.abs(X_num[k1] - Y_num[l2])) )
                 #     )
                 # This is the meta variable index
                 minmeta = int(
-                    np.min([X_num[k1][meta_num_features], X_num[l2][meta_num_features]])
+                    np.min([X_num[k1][meta_num_features], Y_num[l2][meta_num_features]])
                 )
                 maxmeta = int(
-                    np.max([X_num[k1][meta_num_features], X_num[l2][meta_num_features]])
+                    np.max([X_num[k1][meta_num_features], Y_num[l2][meta_num_features]])
                 )
                 ind_dec = min((decreed_num_features).nonzero()[0])
                 abs_delta[minmeta + ind_dec :] = abs_delta[minmeta + ind_dec :] * 0 + 1

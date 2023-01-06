@@ -333,11 +333,6 @@ def gower_componentwise_distances(X, xlimits, y=None, xtypes=None, xroles=None):
     X_norma[:, np.logical_not(cat_features)] = X_num
     Y_norma[:, np.logical_not(cat_features)] = Y_num
 
-    D = X_norma[:, np.newaxis, :] - Y_norma[np.newaxis, :, :]
-    D = D.reshape((-1, X.shape[1]))
-    D = np.abs(D)
-    D[:, cat_features] = D[:, cat_features] > 0.5
-
     n_samples, n_features = X_cat.shape
     n_nonzero_cross_dist = n_samples * (n_samples - 1) // 2
     D_cat = np.zeros((n_nonzero_cross_dist, n_features))
@@ -367,6 +362,8 @@ def gower_componentwise_distances(X, xlimits, y=None, xtypes=None, xroles=None):
     D = np.concatenate((D_cat, D_num), axis=1) * 0
     D[:, np.logical_not(cat_features)] = D_num
     D[:, cat_features] = D_cat
+    D = np.abs(D)
+    D[:, cat_features] = D[:, cat_features] > 0.5
 
     if y is not None:
         return D

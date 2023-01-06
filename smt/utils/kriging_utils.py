@@ -333,88 +333,88 @@ def gower_componentwise_distances(X, xlimits, y=None, xtypes=None, xroles=None):
     X_norma[:, np.logical_not(cat_features)] = X_num
     Y_norma[:, np.logical_not(cat_features)] = Y_num
 
-    n_samples, n_features = X_cat.shape
-    n_nonzero_cross_dist = n_samples * (n_samples - 1) // 2
+    D = X_norma[:, np.newaxis, :] - Y_norma[np.newaxis, :, :]
+    D = D.reshape((-1, X.shape[1]))
+    D = np.abs(D)
+    D[:, cat_features] = D[:, cat_features] > 0.5
+
+    nx_samples, n_features = X_cat.shape
+    ny_samples, n_features = Y_cat.shape
+    n_nonzero_cross_dist = nx_samples * ny_samples
+    if y is None:
+        n_nonzero_cross_dist = nx_samples * (nx_samples - 1) // 2
     D_cat = np.zeros((n_nonzero_cross_dist, n_features))
-    ll_1 = 0
-    
-    for k1 in range(n_samples - 1):
-        ll_0 = ll_1
-        ll_1 = ll_0 + n_samples - k1 - 1
-        D_cat[ll_0:ll_1] = np.where(
-            X_cat[k1] == Y_cat[(k1 + 1) : n_samples],
-            np.zeros_like(X_cat[k1]),
-            np.ones_like(X_cat[k1]),
-        )
-    n_samples, n_features = X_num.shape
-    n_nonzero_cross_dist = n_samples * (n_samples - 1) // 2
-    ij = np.zeros((n_nonzero_cross_dist, 2), dtype=np.int32)
+    indD = 0
+    for k1 in range(nx_samples - 1):
+        for k2 in range(ny_samples - k1 - 1):
+            l2 = k2
+            if y is None:
+                l2 = k2 + k1 + 1
+            D_cat[indD] = X_cat[k1] == Y_cat[l2]
+            indD += 1
+
+    nx_samples, n_features = X_num.shape
+    ny_samples, n_features = Y_num.shape
+    n_nonzero_cross_dist = nx_samples * ny_samples
+    if y is None:
+        n_nonzero_cross_dist = nx_samples * (nx_samples - 1) // 2
     D_num = np.zeros((n_nonzero_cross_dist, n_features))
+    ij = np.zeros((n_nonzero_cross_dist, 2), dtype=np.int32)
     ll_1 = 0
-    for k1 in range(n_samples - 1):
-        ll_0 = ll_1
-        ll_1 = ll_0 + n_samples - k1 - 1
-        ij[ll_0:ll_1, 0] = k1
-        ij[ll_0:ll_1, 1] = np.arange(k1 + 1, n_samples)
-        abs_delta = np.abs(X_num[k1] - Y_num[(k1 + 1) : n_samples])
-        D_num[ll_0:ll_1] = abs_delta
+    indD = 0
+    for k1 in range(nx_samples - 1):
+        if y is None:
+            ll_0 = ll_1
+            ll_1 = ll_0 + nx_samples - k1 - 1
+            ij[ll_0:ll_1, 0] = k1
+            ij[ll_0:ll_1, 1] = np.arange(k1 + 1, nx_samples)
+        for k2 in range(ny_samples - k1 - 1):
+            l2 = k2
+            if y is None:
+                l2 = k2 + k1 + 1
+            D_cat[indD] = np.abs(X_cat[k1] - Y_cat[l2])
+            indD += 1
+    if xroles is not None:
+        indD = 0
+        for k1 in range(nx_samples - 1):
+            for k2 in range(ny_samples - k1 - 1):
+                l2 = k2 + k1 + 1
+                abs_delta = np.abs(X_num[k1] - Y_num[l2])
+                abs_delta[decreed_num_features] = (
+                    2
+                    * np.abs(
+                        X_num[k1][decreed_num_features]
+                        - Y_num[l2][decreed_num_features]
+                    )
+                    / (
+                        np.sqrt(1 + X_num[k1][decreed_num_features] ** 2)
+                        * np.sqrt(1 + Y_num[l2][decreed_num_features] ** 2)
+                    )
+                )
+                #        abs_delta = (
+                #           np.sqrt(2)
+                #          * np.sqrt(1 - np.cos(np.pi/2*np.abs(X_num[k1] - Y_num[l2])) )
+                #     )
+                # This is the meta variable index
+                minmeta = int(
+                    np.min([X_num[k1][meta_num_features], X_num[l2][meta_num_features]])
+                )
+                maxmeta = int(
+                    np.max([X_num[k1][meta_num_features], X_num[l2][meta_num_features]])
+                )
+                ind_dec = min((decreed_num_features).nonzero()[0])
+                abs_delta[minmeta + ind_dec :] = abs_delta[minmeta + ind_dec :] * 0 + 1
+                abs_delta[maxmeta + ind_dec :] = abs_delta[maxmeta + ind_dec :] * 0
+
+                D_num[indD] = abs_delta
+                indD += 1
 
     D = np.concatenate((D_cat, D_num), axis=1) * 0
     D[:, np.logical_not(cat_features)] = D_num
     D[:, cat_features] = D_cat
-    D = np.abs(D)
-    D[:, cat_features] = D[:, cat_features] > 0.5
-
     if y is not None:
         return D
     else:
-        if xroles is not None:
-            indD = 0
-            for k1 in range(n_samples - 1):
-                ll_0 = ll_1
-                ll_1 = ll_0 + n_samples - k1 - 1
-                ij[ll_0:ll_1, 0] = k1
-                ij[ll_0:ll_1, 1] = np.arange(k1 + 1, n_samples)
-                for k2 in range(n_samples - k1 - 1):
-                    l2 = k2 + k1 + 1
-
-                    abs_delta = np.abs(X_num[k1] - Y_num[l2])
-
-                    ## I should have here the decreed continuous dimensions
-                    abs_delta[decreed_num_features] = (
-                        2
-                        * np.abs(
-                            X_num[k1][decreed_num_features]
-                            - Y_num[l2][decreed_num_features]
-                        )
-                        / (
-                            np.sqrt(1 + X_num[k1][decreed_num_features] ** 2)
-                            * np.sqrt(1 + Y_num[l2][decreed_num_features] ** 2)
-                        )
-                    )
-                    #        abs_delta = (
-                    #           np.sqrt(2)
-                    #          * np.sqrt(1 - np.cos(np.pi/2*np.abs(X_num[k1] - Y_num[l2])) )
-                    #     )
-                    # This is the meta variable index
-                    minmeta = int(
-                        np.min(
-                            [X_num[k1][meta_num_features], X_num[l2][meta_num_features]]
-                        )
-                    )
-                    maxmeta = int(
-                        np.max(
-                            [X_num[k1][meta_num_features], X_num[l2][meta_num_features]]
-                        )
-                    )
-                    ind_dec = min((decreed_num_features).nonzero()[0])
-                    abs_delta[minmeta + ind_dec :] = (
-                        abs_delta[minmeta + ind_dec :] * 0 + 1
-                    )
-                    abs_delta[maxmeta + ind_dec :] = abs_delta[maxmeta + ind_dec :] * 0
-
-                    D_num[indD] = abs_delta
-                    indD += 1
         return D, ij.astype(np.int32), X_cont
 
 

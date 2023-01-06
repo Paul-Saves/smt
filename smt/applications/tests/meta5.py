@@ -45,11 +45,11 @@ def f3(x1, x2, x3, x4):
 def f(X):
     y = []
     for x in X:
-        if x[0] == 0:
+        if x[0] == 1:
             y.append(f1(x[1], x[2]))
-        elif x[0] == 1:
-            y.append(f2(x[1], x[2], x[3]))
         elif x[0] == 2:
+            y.append(f2(x[1], x[2], x[3]))
+        elif x[0] == 3:
             y.append(f3(x[1], x[2], x[3], x[4]))
     return np.array(y)
 
@@ -68,11 +68,12 @@ for (xi, yi) in itertools.product(np.linspace(0, 5, 6), np.linspace(-5, -2, 3)):
 x_cont = np.concatenate(
     (np.asarray(v).reshape(-1, 1), np.asarray(u).reshape(-1, 1)), axis=1
 )
-
+xdoe1[:, 0] = np.ones(18)
 xdoe1[:, 1:] = x_cont
 ydoe1 = f(xdoe1)
 
 xdoe1 = np.zeros((18, 5))
+xdoe1[:, 0] = np.ones(18)
 xdoe1[:, 1:3] = x_cont
 
 
@@ -95,12 +96,12 @@ x_cont = np.concatenate(
     axis=1,
 )
 
-xdoe2[:, 0] = np.ones(108)
+xdoe2[:, 0] = 2 * np.ones(108)
 xdoe2[:, 1:4] = x_cont
 ydoe2 = f(xdoe2)
 
 xdoe2 = np.zeros((108, 5))
-xdoe2[:, 0] = np.ones(108)
+xdoe2[:, 0] = 2 * np.ones(108)
 xdoe2[:, 1:4] = x_cont
 
 
@@ -131,14 +132,14 @@ x_cont = np.concatenate(
     ),
     axis=1,
 )
-xdoe3[:, 0] = 2 * np.ones(648)
+xdoe3[:, 0] = 3 * np.ones(648)
 xdoe3[:, 1:5] = x_cont
 ydoe3 = f(xdoe3)
 
 Xt = np.concatenate((xdoe1, xdoe2, xdoe3), axis=0)
 Yt = np.concatenate((ydoe1, ydoe2, ydoe3), axis=0)
 
-xlimits = [[0, 2], [-5, -2], [0.0, 5.0], [0.0, 5.0], [0.0, 5.0]]
+xlimits = [[1, 3], [-5, -2], [0.0, 5.0], [0.0, 5.0], [0.0, 5.0]]
 xtypes = [ORD, FLOAT, ORD, ORD, ORD]
 xroles = [META, NEUTRAL, DECREED, DECREED, DECREED]
 # Surrogate

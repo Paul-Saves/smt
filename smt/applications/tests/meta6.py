@@ -221,3 +221,17 @@ t = b - a
 print(t)
 
 print(sm._surrogate.optimal_theta)
+
+y_s = sm.predict_values(Xt)[:, 0]
+
+print(
+    sm.predict_values(
+        np.array(
+            [
+                [1, -1, -2, 8, 0, 2, 0, 0],
+                [2, -1, -2, 16, 1, 2, 1, 0],
+                [3, -1, -2, 32, 2, 2, 1, -2],
+            ]
+        )
+    )
+)

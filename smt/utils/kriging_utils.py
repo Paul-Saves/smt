@@ -349,7 +349,10 @@ def gower_componentwise_distances(X, xlimits, y=None, xtypes=None, xroles=None):
     D_cat = np.zeros((n_nonzero_cross_dist, n_features))
     indD = 0
     for k1 in range(nx_samples - 1):
-        for k2 in range(ny_samples - k1 - 1):
+        k2max = ny_samples -1
+        if y is None : 
+            k2max = k2max -k1 
+        for k2 in range(k2max):
             l2 = k2
             if y is None:
                 l2 = k2 + k1 + 1
@@ -366,12 +369,14 @@ def gower_componentwise_distances(X, xlimits, y=None, xtypes=None, xroles=None):
     ll_1 = 0
     indD = 0
     for k1 in range(nx_samples - 1):
+        k2max = ny_samples -1        
         if y is None:
+            k2max = k2max -k1 
             ll_0 = ll_1
             ll_1 = ll_0 + nx_samples - k1 - 1
             ij[ll_0:ll_1, 0] = k1
             ij[ll_0:ll_1, 1] = np.arange(k1 + 1, nx_samples)
-        for k2 in range(ny_samples - k1 - 1):
+        for k2 in range(k2max):
             l2 = k2
             if y is None:
                 l2 = k2 + k1 + 1
@@ -380,8 +385,13 @@ def gower_componentwise_distances(X, xlimits, y=None, xtypes=None, xroles=None):
     if xroles is not None:
         indD = 0
         for k1 in range(nx_samples - 1):
-            for k2 in range(ny_samples - k1 - 1):
-                l2 = k2 + k1 + 1
+            k2max = ny_samples -1        
+            if y is None:
+                k2max = k2max -k1 
+            for k2 in range(k2max):
+                l2 = k2
+                if y is None:
+                    l2 = k2 + k1 + 1
                 abs_delta = np.abs(X_num[k1] - Y_num[l2])
                 abs_delta[decreed_num_features] = (
                     2

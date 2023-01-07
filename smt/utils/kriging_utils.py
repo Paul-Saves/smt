@@ -352,9 +352,9 @@ def gower_componentwise_distances(X, xlimits, y=None, xtypes=None, xroles=None):
     if y is None : 
         k1max = nx_samples
     for k1 in range(k1max):
-        k2max = ny_samples -1
+        k2max = ny_samples 
         if y is None : 
-            k2max = k2max -k1 
+            k2max = ny_samples -k1-1  
         for k2 in range(k2max):
             l2 = k2
             if y is None:
@@ -375,9 +375,9 @@ def gower_componentwise_distances(X, xlimits, y=None, xtypes=None, xroles=None):
     if y is None : 
         k1max = nx_samples
     for k1 in range(k1max):
-        k2max = ny_samples -1        
-        if y is None:
-            k2max = k2max -k1 
+        k2max = ny_samples
+        if y is None : 
+            k2max = ny_samples -k1-1  
             ll_0 = ll_1
             ll_1 = ll_0 + nx_samples - k1 - 1
             ij[ll_0:ll_1, 0] = k1
@@ -394,9 +394,9 @@ def gower_componentwise_distances(X, xlimits, y=None, xtypes=None, xroles=None):
         if y is None : 
             k1max = nx_samples
         for k1 in range(k1max):
-            k2max = ny_samples -1        
+            k2max = ny_samples
             if y is None:
-                k2max = k2max -k1 
+                k2max = ny_samples-k1-1        
             for k2 in range(k2max):
                 l2 = k2
                 if y is None:

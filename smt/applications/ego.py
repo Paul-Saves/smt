@@ -120,7 +120,7 @@ class EGO(SurrogateBasedApplication):
                 HOMO_HSPHERE_KERNEL,
                 CONT_RELAX_KERNEL,
             ],
-            desc="The kernel to use for categorical inputs. Only for non continuous Kriging",
+            desc="The kernel to use for categorical inputs. Only for non continuous Kriging.",
         )
         declare(
             "surrogate",
@@ -132,14 +132,8 @@ class EGO(SurrogateBasedApplication):
             "xtypes",
             None,
             types=list,
-            desc="x types specifications: either FLOAT for continuous, INT for integer "
+            desc="x type specifications: either FLOAT for continuous, INT for integer "
             "or (ENUM n) for categorical doimension with n levels",
-        )
-        declare(
-            "xroles",
-            None,
-            types=list,
-            desc="x roles specifications: either NEUTRAL for neutral variables, META for the meta variables and DECREED for the decreed ones",
         )
         self.options.declare(
             "random_state",

@@ -26,14 +26,12 @@ class MixedIntegerSamplingMethod(SamplingMethod):
     handling integer (ORD) or categorical (ENUM) features
     """
 
-    def __init__(self, xtypes, xlimits, sampling_method_class, xroles=None, **kwargs):
+    def __init__(self, xtypes, xlimits, sampling_method_class, **kwargs):
         """
         Parameters
         ----------
         xtypes: x types list
             x types specification
-        xroles: x types list
-            x roles specification
         xlimits: array-like
             bounds of x features
         sampling_method_class: class name
@@ -47,7 +45,6 @@ class MixedIntegerSamplingMethod(SamplingMethod):
         super()
         check_xspec_consistency(xtypes, xlimits)
         self._xtypes = xtypes
-        self._xroles = xroles
         self._xlimits = xlimits
         self._unfolded_xlimits = unfold_xlimits_with_continuous_limits(
             self._xtypes, xlimits
@@ -82,7 +79,6 @@ class MixedIntegerSurrogateModel(SurrogateModel):
         xtypes,
         xlimits,
         surrogate,
-        xroles=None,
         input_in_folded_space=True,
         categorical_kernel=None,
         cat_kernel_comps=None,
@@ -91,9 +87,7 @@ class MixedIntegerSurrogateModel(SurrogateModel):
         Parameters
         ----------
         xtypes: x types list
-            x types specification
-        xroles: x roles list
-            x roles specification
+            x type specification
         xlimits: array-like
             bounds of x features
         surrogate: SMT surrogate model
@@ -109,7 +103,6 @@ class MixedIntegerSurrogateModel(SurrogateModel):
         self._categorical_kernel = categorical_kernel
         self._cat_kernel_comps = cat_kernel_comps
         self._xtypes = xtypes
-        self._xroles = xroles
         self._xlimits = xlimits
         self._surrogate.options["xlimits"] = self._xlimits
 
@@ -136,7 +129,6 @@ class MixedIntegerSurrogateModel(SurrogateModel):
             if self._cat_kernel_comps is not None:
                 self._surrogate.options["cat_kernel_comps"] = self._cat_kernel_comps
             self._surrogate.options["xtypes"] = self._xtypes
-            self._surrogate.options["xroles"] = self._xroles
 
     @property
     def name(self):
@@ -203,7 +195,6 @@ class MixedIntegerContext(object):
         self,
         xtypes,
         xlimits,
-        xroles=None,
         work_in_folded_space=True,
         categorical_kernel=None,
         cat_kernel_comps=None,
@@ -212,19 +203,16 @@ class MixedIntegerContext(object):
         Parameters
         ----------
         xtypes: x types list
-            x types specification: list of either FLOAT, ORD or (ENUM, n) spec.
-        xroles: x roles list
-            x roles specification: list of either NEUTRAL, META or DECREED spec.
+            x type specification: list of either FLOAT, ORD or (ENUM, n) spec.
         xlimits: array-like
             bounds of x features
         work_in_folded_space: bool
             whether x data are in given in folded space (enum indexes) or not (enum masks)
         categorical_kernel: string
-            the kernel to use for categorical inputs. Only for non continuous Kriging
+            the kernel to use for categorical inputs. Only for non continuous Kriging.
         """
         check_xspec_consistency(xtypes, xlimits)
         self._xtypes = xtypes
-        self._xroles = xroles
         self._xlimits = xlimits
         self._categorical_kernel = categorical_kernel
         self._cat_kernel_comps = cat_kernel_comps
@@ -248,7 +236,6 @@ class MixedIntegerContext(object):
         """
         return MixedIntegerSurrogateModel(
             xtypes=self._xtypes,
-            xroles=self._xroles,
             xlimits=self._xlimits,
             surrogate=surrogate,
             input_in_folded_space=self._work_in_folded_space,

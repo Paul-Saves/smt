@@ -359,7 +359,7 @@ def gower_componentwise_distances(X, xlimits, y=None, xtypes=None, xroles=None):
             l2 = k2
             if y is None:
                 l2 = k2 + k1 + 1
-            D_cat[indD] = X_cat[k1] == Y_cat[l2]
+            D_cat[indD] = X_cat[k1] != Y_cat[l2]
             indD += 1
 
     nx_samples, n_features = X_num.shape
@@ -386,7 +386,7 @@ def gower_componentwise_distances(X, xlimits, y=None, xtypes=None, xroles=None):
             l2 = k2
             if y is None:
                 l2 = k2 + k1 + 1
-            D_cat[indD] = np.abs(X_cat[k1] - Y_cat[l2])
+            D_num[indD] = np.abs(X_num[k1] - Y_num[l2])
             indD += 1
     if xroles is not None:
         indD = 0

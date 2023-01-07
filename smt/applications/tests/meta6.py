@@ -222,16 +222,19 @@ print(t)
 
 print(sm._surrogate.optimal_theta)
 
-y_s = sm.predict_values(Xt[:1])[: 0]
+y_s = sm.predict_values(Xt)[:,0]
+pred_RMSE = np.linalg.norm(y_s-Yt)/np.sqrt(len(Yt))
 
-print(
-    sm.predict_values(
-        np.array(
-            [
-                [1, -1, -2, 8, 0, 2, 0, 0],
-                [2, -1, -2, 16, 1, 2, 1, 0],
-                [3, -1, -2, 32, 2, 2, 1, -2],
-            ]
-        )
-    )
-)
+y_sv = sm.predict_variances(Xt)[:,0]
+var_RMSE = np.linalg.norm(y_sv)/np.sqrt(len(Yt))
+
+print( "interpol_eror", pred_RMSE )
+print( "interpol_variance", var_RMSE )
+y_s = sm.predict_values(Xt)[:,0]
+pred_RMSE = np.linalg.norm(y_s-Yt)/np.sqrt(len(Yt))
+
+y_sv = sm.predict_variances(Xt)[:,0]
+var_RMSE = np.linalg.norm(y_sv)/np.sqrt(len(Yt))
+
+print( "interpol_eror", pred_RMSE )
+print( "interpol_variance", var_RMSE )

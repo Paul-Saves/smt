@@ -222,7 +222,7 @@ print(t)
 
 print(sm._surrogate.optimal_theta)
 
-y_s = sm.predict_values(Xt)[:, 0]
+y_s = sm.predict_values(Xt[:1])[: 0]
 
 print(
     sm.predict_values(

@@ -42,10 +42,9 @@ from smt.surrogate_models import (
     EXP_HOMO_HSPHERE_KERNEL,
     GOWER_KERNEL,
 )
-  
+
+
 class TestMixedInteger(unittest.TestCase):
-    
-    
     def test_qp_mixed_2D_INT(self):
         xtypes = [FLOAT, ORD]
         xlimits = [[-10, 10], [-10, 10]]
@@ -419,27 +418,23 @@ class TestMixedInteger(unittest.TestCase):
 
         plt.show()
 
-    def test_hierarchical_variables(self) : 
+    def test_hierarchical_variables(self):
         def f_neu(x1, x2, x3, x4):
-           if x4 == 0:
-               return 2 * x1 + x2 - 0.5 * x3
-           if x4 == 1:
-               return -x1 + 2 * x2 - 0.5 * x3
-           if x4 == 2:
-               return -x1 + x2 + 0.5 * x3
-
+            if x4 == 0:
+                return 2 * x1 + x2 - 0.5 * x3
+            if x4 == 1:
+                return -x1 + 2 * x2 - 0.5 * x3
+            if x4 == 2:
+                return -x1 + x2 + 0.5 * x3
 
         def f1(x1, x2, x3, x4, x5):
             return f_neu(x1, x2, x3, x4) + x5**2
 
-
         def f2(x1, x2, x3, x4, x5, x6):
             return f_neu(x1, x2, x3, x4) + (x5**2) + 0.3 * x6
 
-
         def f3(x1, x2, x3, x4, x5, x6, x7):
             return f_neu(x1, x2, x3, x4) + (x5**2) + 0.3 * x6 - 0.1 * x7**3
-
 
         def f(X):
             y = []
@@ -490,7 +485,6 @@ class TestMixedInteger(unittest.TestCase):
         xdoe1[:, 0] = np.ones(48)
         xdoe1[:, 1:6] = x_cont
 
-
         xdoe2 = np.zeros((96, 7))
         u = []
         v = []
@@ -532,7 +526,6 @@ class TestMixedInteger(unittest.TestCase):
         xdoe2 = np.zeros((96, 8))
         xdoe2[:, 0] = 2 * np.ones(96)
         xdoe2[:, 1:7] = x_cont
-
 
         xdoe3 = np.zeros((192, 8))
 
@@ -602,15 +595,45 @@ class TestMixedInteger(unittest.TestCase):
         )
         sm.set_training_values(Xt, Yt)
         sm.train()
-        y_s = sm.predict_values(Xt)[:,0]
-        pred_RMSE = np.linalg.norm(y_s-Yt)/np.sqrt(len(Yt))
+        y_s = sm.predict_values(Xt)[:, 0]
+        pred_RMSE = np.linalg.norm(y_s - Yt) / np.sqrt(len(Yt))
 
-        y_sv = sm.predict_variances(Xt)[:,0]
-        var_RMSE = np.linalg.norm(y_sv)/np.sqrt(len(Yt))
+        y_sv = sm.predict_variances(Xt)[:, 0]
+        var_RMSE = np.linalg.norm(y_sv) / np.sqrt(len(Yt))
         self.assertTrue(pred_RMSE < 1e-8)
         self.assertTrue(var_RMSE < 1e-7)
-
-
+        self.assertTrue(
+            np.linalg.norm(
+                sm.predict_values(
+                    np.array(
+                        [
+                            [1, -1, -2, 8, 0, 2, 0, 0],
+                            [2, -1, -2, 16, 1, 2, 1, 0],
+                            [3, -1, -2, 32, 2, 2, 1, -2],
+                        ]
+                    )
+                )[:, 0]
+                - sm.predict_values(
+                    np.array(
+                        [
+                            [1, -1, -2, 8, 0, 2, 10, 10],
+                            [2, -1, -2, 16, 1, 2, 1, 10],
+                            [3, -1, -2, 32, 2, 2, 1, -2],
+                        ]
+                    )
+                )[:, 0]
+            )
+            < 1e-8
+        )
+        self.assertTrue(
+            np.linalg.norm(
+                sm.predict_values(
+                    np.array([[1, -1, -2, 8, 0, 2, 0, 0]])
+                    - sm.predict_values(np.array([[1, -1, -2, 8, 0, 12, 10, 10]]))
+                )
+            )
+            > 1e-8
+        )
 
     def test_mixed_gower_2D(self):
         import matplotlib.pyplot as plt

@@ -303,13 +303,13 @@ def gower_componentwise_distances(X, xlimits, y=None, xtypes=None, xroles=None):
     lim = np.array(xlimits, dtype=object)[np.logical_not(cat_features)]
     lb = np.zeros(np.shape(lim)[0])
     ub = np.ones(np.shape(lim)[0])
-    maxmetanum=1
+    maxmetanum = 1
     if np.shape(lim)[0] > 0:
         for k, i in enumerate(lim):
             if (xroles is None) or (xroles[k] != "meta_role"):
                 lb[k] = i[0]
                 ub[k] = i[-1]
-            else : 
+            else:
                 maxmetanum = i[-1]
 
         Z_offset = lb
@@ -349,12 +349,12 @@ def gower_componentwise_distances(X, xlimits, y=None, xtypes=None, xroles=None):
     D_cat = np.zeros((n_nonzero_cross_dist, n_features))
     indD = 0
     k1max = nx_samples
-    if y is None : 
-        k1max = nx_samples-1
+    if y is None:
+        k1max = nx_samples - 1
     for k1 in range(k1max):
-        k2max = ny_samples 
-        if y is None : 
-            k2max = ny_samples -k1-1  
+        k2max = ny_samples
+        if y is None:
+            k2max = ny_samples - k1 - 1
         for k2 in range(k2max):
             l2 = k2
             if y is None:
@@ -372,12 +372,12 @@ def gower_componentwise_distances(X, xlimits, y=None, xtypes=None, xroles=None):
     ll_1 = 0
     indD = 0
     k1max = nx_samples
-    if y is None : 
-        k1max = nx_samples-1
+    if y is None:
+        k1max = nx_samples - 1
     for k1 in range(k1max):
         k2max = ny_samples
-        if y is None : 
-            k2max = ny_samples -k1-1  
+        if y is None:
+            k2max = ny_samples - k1 - 1
             ll_0 = ll_1
             ll_1 = ll_0 + nx_samples - k1 - 1
             ij[ll_0:ll_1, 0] = k1
@@ -391,12 +391,12 @@ def gower_componentwise_distances(X, xlimits, y=None, xtypes=None, xroles=None):
     if xroles is not None:
         indD = 0
         k1max = nx_samples
-        if y is None : 
-            k1max = nx_samples-1
+        if y is None:
+            k1max = nx_samples - 1
         for k1 in range(k1max):
             k2max = ny_samples
             if y is None:
-                k2max = ny_samples-k1-1        
+                k2max = ny_samples - k1 - 1
             for k2 in range(k2max):
                 l2 = k2
                 if y is None:
@@ -411,8 +411,9 @@ def gower_componentwise_distances(X, xlimits, y=None, xtypes=None, xroles=None):
                     / (
                         np.sqrt(1 + X_num[k1][decreed_num_features] ** 2)
                         * np.sqrt(1 + Y_num[l2][decreed_num_features] ** 2)
-                    ))
-                abs_delta[meta_num_features] =  abs_delta[meta_num_features]/maxmetanum
+                    )
+                )
+                abs_delta[meta_num_features] = abs_delta[meta_num_features] / maxmetanum
 
                 #        abs_delta = (
                 #           np.sqrt(2)

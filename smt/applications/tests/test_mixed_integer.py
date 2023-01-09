@@ -509,10 +509,10 @@ class TestMixedInteger(unittest.TestCase):
         sm.set_training_values(Xt, Yt)
         sm.train()
         y_s = sm.predict_values(Xt)[:, 0]
-        pred_RMSE = np.linalg.norm(y_s - Yt) / np.sqrt(len(Yt))
+        pred_RMSE = np.linalg.norm(y_s - Yt) /len(Yt)
 
         y_sv = sm.predict_variances(Xt)[:, 0]
-        var_RMSE = np.linalg.norm(y_sv) / np.sqrt(len(Yt))
+        var_RMSE = np.linalg.norm(y_sv) /len(Yt)
         self.assertTrue(pred_RMSE < 1e-7)
         print("Pred_RMSE", pred_RMSE)
         self.assertTrue(var_RMSE < 1e-7)

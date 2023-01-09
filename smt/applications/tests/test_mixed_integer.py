@@ -447,131 +447,6 @@ class TestMixedInteger(unittest.TestCase):
                     y.append(f3(x[1], x[2], x[3], x[4], x[5], x[6], x[7]))
             return np.array(y)
 
-        xdoe1 = np.zeros((48, 6))
-
-        u = []
-        v = []
-        w = []
-        x = []
-        y = []
-        for (xi, yi, zi, ai, bi) in itertools.product(
-            np.linspace(0, 5, 2),
-            np.linspace(-5, -2, 2),
-            np.linspace(-5, -1, 2),
-            np.array([32, 128]),
-            np.array([0, 1, 2]),
-        ):
-            u.append(xi)
-
-            v.append(bi)
-            w.append(ai)
-            x.append(zi)
-            y.append(yi)
-        x_cont = np.concatenate(
-            (
-                np.asarray(y).reshape(-1, 1),
-                np.asarray(x).reshape(-1, 1),
-                np.asarray(w).reshape(-1, 1),
-                np.asarray(v).reshape(-1, 1),
-                np.asarray(u).reshape(-1, 1),
-            ),
-            axis=1,
-        )
-        xdoe1[:, 0] = np.ones(48)
-        xdoe1[:, 1:] = x_cont
-        ydoe1 = f(xdoe1)
-
-        xdoe1 = np.zeros((48, 8))
-        xdoe1[:, 0] = np.ones(48)
-        xdoe1[:, 1:6] = x_cont
-
-        xdoe2 = np.zeros((96, 7))
-        u = []
-        v = []
-        w = []
-        x = []
-        y = []
-        z = []
-        for (xi, yi, zi, ai, bi, ci) in itertools.product(
-            np.linspace(0, 5, 2),
-            np.linspace(0, 5, 2),
-            np.linspace(-5, -2, 2),
-            np.linspace(-5, -1, 2),
-            np.array([32, 128]),
-            np.array([0, 1, 2]),
-        ):
-            u.append(xi)
-            v.append(yi)
-
-            w.append(ci)
-            x.append(bi)
-            y.append(ai)
-            z.append(zi)
-        x_cont = np.concatenate(
-            (
-                np.asarray(z).reshape(-1, 1),
-                np.asarray(y).reshape(-1, 1),
-                np.asarray(x).reshape(-1, 1),
-                np.asarray(w).reshape(-1, 1),
-                np.asarray(v).reshape(-1, 1),
-                np.asarray(u).reshape(-1, 1),
-            ),
-            axis=1,
-        )
-
-        xdoe2[:, 0] = 2 * np.ones(96)
-        xdoe2[:, 1:7] = x_cont
-        ydoe2 = f(xdoe2)
-
-        xdoe2 = np.zeros((96, 8))
-        xdoe2[:, 0] = 2 * np.ones(96)
-        xdoe2[:, 1:7] = x_cont
-
-        xdoe3 = np.zeros((192, 8))
-
-        u = []
-        v = []
-        w = []
-        x = []
-        y = []
-        z = []
-        zz = []
-        for (xi, yi, zi, ai, bi, ci, di) in itertools.product(
-            np.linspace(0, 5, 2),
-            np.linspace(0, 5, 2),
-            np.linspace(0, 5, 2),
-            np.linspace(-5, -2, 2),
-            np.linspace(-5, -1, 2),
-            np.array([32, 128]),
-            np.array([0, 1, 2]),
-        ):
-            u.append(xi)
-            v.append(yi)
-            w.append(zi)
-
-            x.append(di)
-            y.append(ci)
-            z.append(bi)
-            zz.append(ai)
-        x_cont = np.concatenate(
-            (
-                np.asarray(zz).reshape(-1, 1),
-                np.asarray(z).reshape(-1, 1),
-                np.asarray(y).reshape(-1, 1),
-                np.asarray(x).reshape(-1, 1),
-                np.asarray(w).reshape(-1, 1),
-                np.asarray(v).reshape(-1, 1),
-                np.asarray(u).reshape(-1, 1),
-            ),
-            axis=1,
-        )
-        xdoe3[:, 0] = 3 * np.ones(192)
-        xdoe3[:, 1:] = x_cont
-        ydoe3 = f(xdoe3)
-
-        Xt = np.concatenate((xdoe1, xdoe2, xdoe3), axis=0)
-        Yt = np.concatenate((ydoe1, ydoe2, ydoe3), axis=0)
-
         xlimits = [
             [1, 3],  # meta ord
             [-5, -2],
@@ -584,6 +459,44 @@ class TestMixedInteger(unittest.TestCase):
         ]
         xtypes = [ORD, FLOAT, FLOAT, ORD, (ENUM, 3), ORD, ORD, ORD]
         xroles = [META, NEUTRAL, NEUTRAL, NEUTRAL, NEUTRAL, DECREED, DECREED, DECREED]
+
+        n_doe = 100
+
+        xtypes2 = xtypes[1:]
+        xlimits2 = xlimits[1:]
+
+        sampling = MixedIntegerSamplingMethod(
+            xtypes2, xlimits2, LHS, criterion="ese", random_state=42
+        )
+        x_cont = sampling(3 * n_doe)
+
+        xdoe1 = np.zeros((n_doe, 6))
+        x_cont2 = x_cont[:n_doe, :5]
+        xdoe1[:, 0] = np.ones(n_doe)
+        xdoe1[:, 1:] = x_cont2
+        ydoe1 = f(xdoe1)
+
+        xdoe1 = np.zeros((n_doe, 8))
+        xdoe1[:, 0] = np.ones(n_doe)
+        xdoe1[:, 1:6] = x_cont2
+
+        xdoe2 = np.zeros((n_doe, 7))
+        x_cont2 = x_cont[n_doe : 2 * n_doe, :6]
+        xdoe2[:, 0] = 2 * np.ones(n_doe)
+        xdoe2[:, 1:7] = x_cont2
+        ydoe2 = f(xdoe2)
+
+        xdoe2 = np.zeros((n_doe, 8))
+        xdoe2[:, 0] = 2 * np.ones(n_doe)
+        xdoe2[:, 1:7] = x_cont2
+
+        xdoe3 = np.zeros((n_doe, 8))
+        xdoe3[:, 0] = 3 * np.ones(n_doe)
+        xdoe3[:, 1:] = x_cont[2 * n_doe :, :]
+        ydoe3 = f(xdoe3)
+
+        Xt = np.concatenate((xdoe1, xdoe2, xdoe3), axis=0)
+        Yt = np.concatenate((ydoe1, ydoe2, ydoe3), axis=0)
 
         # Surrogate
         sm = MixedIntegerSurrogateModel(
@@ -627,10 +540,8 @@ class TestMixedInteger(unittest.TestCase):
         )
         self.assertTrue(
             np.linalg.norm(
-                sm.predict_values(
-                    np.array([[1, -1, -2, 8, 0, 2, 0, 0]])
-                    - sm.predict_values(np.array([[1, -1, -2, 8, 0, 12, 10, 10]]))
-                )
+                sm.predict_values(np.array([[1, -1, -2, 8, 0, 2, 0, 0]]))
+                - sm.predict_values(np.array([[1, -1, -2, 8, 0, 12, 10, 10]]))
             )
             > 1e-8
         )

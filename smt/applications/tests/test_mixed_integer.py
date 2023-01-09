@@ -504,7 +504,7 @@ class TestMixedInteger(unittest.TestCase):
             xtypes=xtypes,
             xroles=xroles,
             xlimits=xlimits,
-            surrogate=KRG(theta0=[1e-2], n_start=5, corr="abs_exp", nugget=1e-13),
+            surrogate=KRG(theta0=[1e-2], n_start=5, corr="abs_exp"),
         )
         sm.set_training_values(Xt, Yt)
         sm.train()

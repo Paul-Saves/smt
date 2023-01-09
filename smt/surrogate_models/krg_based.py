@@ -248,7 +248,6 @@ class KrgBased(SurrogateModel):
             self.optimal_par,
             self.optimal_theta,
         ) = self._optimize_hyperparam(D)
-        print(self.optimal_rlf_value)
         if self.name in ["MGP"]:
             self._specific_train()
         else:
@@ -633,7 +632,6 @@ class KrgBased(SurrogateModel):
             C = linalg.cholesky(R, lower=True)
         except (linalg.LinAlgError, ValueError) as e:
             print("exception : ", e)
-            print(min(np.linalg.eig(R)[0]))
             return reduced_likelihood_function_value, par
 
         # Get generalized least squared solution

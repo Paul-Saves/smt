@@ -353,98 +353,98 @@ class EGO(SurrogateBasedApplication):
                     x_data, y_data[:, 1 + kx].reshape((y_data.shape[0], 1)), kx
                 )
         self.gpr.train()
+        
+   def _find_best_point(self, x_data=None, y_data=None, enable_tunneling=False):
+       """
+       Function that analyse a set of x_data and y_data and give back the
+       more interesting point to evaluates according to the selected criterion
 
-    def _find_best_point(self, x_data=None, y_data=None, enable_tunneling=False):
-        """
-        Function that analyse a set of x_data and y_data and give back the
-        more interesting point to evaluates according to the selected criterion
+       Parameters
+       ----------
 
-        Parameters
-        ----------
+       x_data: ndarray(n_points, nx)
+       y_data: ndarray(n_points, 1)
 
-        x_data: ndarray(n_points, nx)
-        y_data: ndarray(n_points, 1)
+       Returns
+       -------
 
-        Returns
-        -------
+       ndarray(nx, 1): the next best point to evaluate
+       boolean: success flag
 
-        ndarray(nx, 1): the next best point to evaluate
-        boolean: success flag
+       """
+       self._train_gpr(x_data, y_data)
 
-        """
-        self._train_gpr(x_data, y_data)
+       criterion = self.options["criterion"]
+       n_start = self.options["n_start"]
+       n_max_optim = self.options["n_max_optim"]
+       if self.mixint:
+           bounds = self.mixint.get_unfolded_xlimits()
+           method = "COBYLA"
+           cons = []
+           for j in range(len(bounds)):
+               lower, upper = bounds[j]
+               if self.options["categorical_kernel"] is not None:
+                   if isinstance(self.options["xtypes"][j], tuple):
+                       upper = int(upper - 1)
+               l = {"type": "ineq", "fun": lambda x, lb=lower, i=j: x[i] - lb}
+               u = {"type": "ineq", "fun": lambda x, ub=upper, i=j: ub - x[i]}
+               cons.append(l)
+               cons.append(u)
+               options = {"catol": 1e-6, "tol": 1e-6, "rhobeg": 0.1}
+       else:
+           bounds = self.xlimits
+           method = "SLSQP"
+           cons = ()
+           options = {"maxiter": 200}
 
-        criterion = self.options["criterion"]
-        n_start = self.options["n_start"]
-        n_max_optim = self.options["n_max_optim"]
-        if self.mixint:
-            bounds = self.mixint.get_unfolded_xlimits()
-            method = "COBYLA"
-            cons = []
-            for j in range(len(bounds)):
-                lower, upper = bounds[j]
-                if isinstance(self.options["xtypes"][j], tuple):
-                    upper = int(upper - 1)
-                l = {"type": "ineq", "fun": lambda x, lb=lower, i=j: x[i] - lb}
-                u = {"type": "ineq", "fun": lambda x, ub=upper, i=j: ub - x[i]}
-                cons.append(l)
-                cons.append(u)
-                options = {"tol": 1e-6,"rhobeg":0.1}
-        else:
-            bounds = self.xlimits
-            method = "SLSQP"
-            cons = ()
-            options = {"maxiter": 200}
+       if criterion == "EI":
+           self.obj_k = lambda x: -self.EI(np.atleast_2d(x), enable_tunneling, x_data)
+       elif criterion == "SBO":
+           self.obj_k = lambda x: self.SBO(np.atleast_2d(x))
+       elif criterion == "LCB":
+           self.obj_k = lambda x: self.LCB(np.atleast_2d(x))
 
+       success = False
+       n_optim = 1  # in order to have some success optimizations with SLSQP
+       while not success and n_optim <= n_max_optim:
+           opt_all = []
+           x_start = self._sampling_optim(n_start)
+           for ii in range(n_start):
+               try:
+                   opt_all.append(
+                       minimize(
+                           lambda x: float(np.array(self.obj_k(x)).flat[0]),
+                           x_start[ii, :],
+                           method=method,
+                           bounds=bounds,
+                           constraints=cons,
+                           options=options,
+                       )
+                   )
 
-        if criterion == "EI":
-            self.obj_k = lambda x: -self.EI(np.atleast_2d(x), enable_tunneling, x_data)
-        elif criterion == "SBO":
-            self.obj_k = lambda x: self.SBO(np.atleast_2d(x))
-        elif criterion == "LCB":
-            self.obj_k = lambda x: self.LCB(np.atleast_2d(x))
+               except ValueError:  # in case "x0 violates bound constraints" error
+                   print("warning: `x0` violates bound constraints")
+                   print("x0={}".format(x_start[ii, :]))
+                   print("bounds={}".format(bounds))
+                   opt_all.append({"success": False})
 
-        success = False
-        n_optim = 1  # in order to have some success optimizations with SLSQP
-        while not success and n_optim <= n_max_optim:
-            opt_all = []
-            x_start = self._sampling_optim(n_start)
-            for ii in range(n_start):
-                try:
-                    opt_all.append(
-                        minimize(
-                            lambda x: float(np.array(self.obj_k(x)).flat[0]),
-                            x_start[ii, :],
-                            method=method,
-                            bounds=bounds,
-                            constraints=cons,
-                            options=options,
-                        )
-                    )
+           opt_all = np.asarray(opt_all)
 
-                except ValueError:  # in case "x0 violates bound constraints" error
-                    print("warning: `x0` violates bound constraints")
-                    print("x0={}".format(x_start[ii, :]))
-                    print("bounds={}".format(bounds))
-                    opt_all.append({"success": False})
+           opt_success = opt_all[[opt_i["success"] for opt_i in opt_all]]
+           obj_success = np.array([opt_i["fun"] for opt_i in opt_success])
+           success = obj_success.size != 0
+           if not success:
+               self.log("New start point for the internal optimization")
+               n_optim += 1
+               n_start += 10
+       if n_optim >= n_max_optim:
+           # self.log("Internal optimization failed at EGO iter = {}".format(k))
+           return np.atleast_2d(0), False
+       ind_min = np.argmin(obj_success)
+       opt = opt_success[ind_min]
+       x_et_k = np.atleast_2d(opt["x"])
 
-            opt_all = np.asarray(opt_all)
-
-            opt_success = opt_all[[opt_i["success"] for opt_i in opt_all]]
-            obj_success = np.array([opt_i["fun"] for opt_i in opt_success])
-            success = obj_success.size != 0
-            if not success:
-                self.log("New start point for the internal optimization")
-                n_optim += 1
-                n_start += 10
-        if n_optim >= n_max_optim:
-            # self.log("Internal optimization failed at EGO iter = {}".format(k))
-            return np.atleast_2d(0), False
-        ind_min = np.argmin(obj_success)
-        opt = opt_success[ind_min]
-        x_et_k = np.atleast_2d(opt["x"])
-
-        return x_et_k, True
+       return x_et_k, True
 
     def _get_virtual_point(self, x, y_data):
         """

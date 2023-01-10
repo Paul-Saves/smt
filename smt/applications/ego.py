@@ -75,7 +75,7 @@ class EGO(SurrogateBasedApplication):
             types=int,
             desc="Maximum number of internal optimizations",
         )
-        declare("n_start", 20, types=int, desc="Number of optimization start points")
+        declare("n_start", 25, types=int, desc="Number of optimization start points")
         declare(
             "n_parallel",
             1,
@@ -304,12 +304,21 @@ class EGO(SurrogateBasedApplication):
                 random_state=self.options["random_state"],
                 output_in_folded_space=work_in_folded_space,
             )
+            self._sampling_optim = self.mixint.build_sampling_method(
+                LHS,
+                criterion="ese",
+                output_in_folded_space=work_in_folded_space,
+            )
         else:
             self.mixint = None
             self._sampling = LHS(
                 xlimits=self.xlimits,
                 criterion="ese",
                 random_state=self.options["random_state"],
+            )
+            self._sampling_optim = LHS(
+                xlimits=self.xlimits,
+                criterion="ese",
             )
 
         # Build DOE
@@ -381,9 +390,8 @@ class EGO(SurrogateBasedApplication):
         n_optim = 1  # in order to have some success optimizations with SLSQP
         while not success and n_optim <= n_max_optim:
             opt_all = []
-            x_start = self._sampling(n_start)
+            x_start = self._sampling_optim(n_start)
             for ii in range(n_start):
-
                 try:
                     opt_all.append(
                         minimize(
@@ -409,12 +417,13 @@ class EGO(SurrogateBasedApplication):
             if not success:
                 self.log("New start point for the internal optimization")
                 n_optim += 1
-
+                n_start += 10
         if n_optim >= n_max_optim:
             # self.log("Internal optimization failed at EGO iter = {}".format(k))
             return np.atleast_2d(0), False
         ind_min = np.argmin(obj_success)
         opt = opt_success[ind_min]
+       # print("EI", opt["fun"])
         x_et_k = np.atleast_2d(opt["x"])
 
         return x_et_k, True

@@ -135,12 +135,6 @@ class EGO(SurrogateBasedApplication):
             desc="x types specifications: either FLOAT for continuous, INT for integer "
             "or (ENUM n) for categorical doimension with n levels",
         )
-        declare(
-            "xroles",
-            None,
-            types=list,
-            desc="x roles specifications: either NEUTRAL for neutral variables, META for the meta variables and DECREED for the decreed ones",
-        )
         self.options.declare(
             "random_state",
             types=(type(None), int, np.random.RandomState),
@@ -388,6 +382,7 @@ class EGO(SurrogateBasedApplication):
                 cons.append(l)
                 cons.append(u)
                 options = {"catol": 1e-6, "tol": 1e-6, "rhobeg": 0.1}
+                bounds = None
         else:
             bounds = self.xlimits
             method = "SLSQP"

@@ -75,7 +75,7 @@ class EGO(SurrogateBasedApplication):
             types=int,
             desc="Maximum number of internal optimizations",
         )
-        declare("n_start", 25, types=int, desc="Number of optimization start points")
+        declare("n_start", 20, types=int, desc="Number of optimization start points")
         declare(
             "n_parallel",
             1,
@@ -376,6 +376,7 @@ class EGO(SurrogateBasedApplication):
         n_max_optim = self.options["n_max_optim"]
         if self.mixint:
             bounds = self.mixint.get_unfolded_xlimits()
+            n_start += 10
         else:
             bounds = self.xlimits
 
@@ -423,7 +424,6 @@ class EGO(SurrogateBasedApplication):
             return np.atleast_2d(0), False
         ind_min = np.argmin(obj_success)
         opt = opt_success[ind_min]
-       # print("EI", opt["fun"])
         x_et_k = np.atleast_2d(opt["x"])
 
         return x_et_k, True

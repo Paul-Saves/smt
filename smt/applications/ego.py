@@ -224,7 +224,10 @@ class EGO(SurrogateBasedApplication):
         """Expected improvement"""
         y_data = np.atleast_2d(self.gpr.training_points[None][0][1])
         f_min = y_data[np.argmin(y_data[:, 0])]
-        pred = self.gpr.predict_values(points)
+        try : 
+            pred = self.gpr.predict_values(points)
+        except : 
+            print("ff")
         sig = np.sqrt(self.gpr.predict_variances(points))
         args0 = (f_min - pred) / sig
         args1 = (f_min - pred) * norm.cdf(args0)
@@ -378,16 +381,21 @@ class EGO(SurrogateBasedApplication):
             bounds = self.mixint.get_unfolded_xlimits()
             method = "COBYLA"
             cons = []
-            for factor in range(len(bounds)):
-                lower, upper = bounds[factor]
-                l = {"type": "ineq", "fun": lambda x, lb=lower, i=factor: x[i] - lb}
-                u = {"type": "ineq", "fun": lambda x, ub=upper, i=factor: ub - x[i]}
+            for j in range(len(bounds)):
+                lower, upper = bounds[j]
+                if isinstance(self.options["xtypes"][j], tuple):
+                    upper = int(upper - 1)
+                l = {"type": "ineq", "fun": lambda x, lb=lower, i=j: x[i] - lb}
+                u = {"type": "ineq", "fun": lambda x, ub=upper, i=j: ub - x[i]}
                 cons.append(l)
                 cons.append(u)
+                options = {"tol": 1e-6,"rhobeg":0.1}
         else:
             bounds = self.xlimits
             method = "SLSQP"
             cons = ()
+            options = {"maxiter": 200}
+
 
         if criterion == "EI":
             self.obj_k = lambda x: -self.EI(np.atleast_2d(x), enable_tunneling, x_data)
@@ -410,7 +418,7 @@ class EGO(SurrogateBasedApplication):
                             method=method,
                             bounds=bounds,
                             constraints=cons,
-                            options={"maxiter": 200},
+                            options=options,
                         )
                     )
 

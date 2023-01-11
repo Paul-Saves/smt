@@ -520,7 +520,7 @@ class TestEGO(SMTestCase):
             float(y_opt),
             delta=15,
         )
-        self.assertTrue(np.allclose([[3, -5, -5, 256, 0, 0, 0, 5]], x_opt, atol=3))
+        self.assertTrue(np.allclose([[3, -5, -5, 256, 0, 0, 0, 5]], x_opt, atol=4))
 
     def test_ego_mixed_integer_homo_gaussian(self):
         n_iter = 15

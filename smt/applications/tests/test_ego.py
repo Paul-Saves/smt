@@ -419,40 +419,40 @@ class TestEGO(SMTestCase):
 
         self.assertAlmostEqual(-15, float(y_opt), delta=5)
 
-    @staticmethod
-    def f_neu(x1, x2, x3, x4):
-        if x4 == 0:
-            return 2 * x1 + x2 - 0.5 * x3
-        if x4 == 1:
-            return -x1 + 2 * x2 - 0.5 * x3
-        if x4 == 2:
-            return -x1 + x2 + 0.5 * x3
-
-    @staticmethod
-    def f1(self, x1, x2, x3, x4, x5):
-        return self.f_neu(x1, x2, x3, x4) + x5**2
-
-    @staticmethod
-    def f2(self, x1, x2, x3, x4, x5, x6):
-        return self.f_neu(x1, x2, x3, x4) + (x5**2) + 0.3 * x6
-
-    @staticmethod
-    def f3(self, x1, x2, x3, x4, x5, x6, x7):
-        return self.f_neu(x1, x2, x3, x4) + (x5**2) + 0.3 * x6 - 0.1 * x7**3
-
-    @staticmethod
-    def f_hv(self, X):
-        y = []
-        for x in X:
-            if x[0] == 1:
-                y.append(self.f1(x[1], x[2], x[3], x[4], x[5]))
-            elif x[0] == 2:
-                y.append(self.f2(x[1], x[2], x[3], x[4], x[5], x[6]))
-            elif x[0] == 3:
-                y.append(self.f3(x[1], x[2], x[3], x[4], x[5], x[6], x[7]))
-        return np.array(y)
-
     def test_ego_mixed_integer_hierarchical(self):
+        @staticmethod
+        def f_neu(x1, x2, x3, x4):
+            if x4 == 0:
+                return 2 * x1 + x2 - 0.5 * x3
+            if x4 == 1:
+                return -x1 + 2 * x2 - 0.5 * x3
+            if x4 == 2:
+                return -x1 + x2 + 0.5 * x3
+
+        @staticmethod
+        def f1(x1, x2, x3, x4, x5):
+            return f_neu(x1, x2, x3, x4) + x5**2
+
+        @staticmethod
+        def f2(x1, x2, x3, x4, x5, x6):
+            return f_neu(x1, x2, x3, x4) + (x5**2) + 0.3 * x6
+
+        @staticmethod
+        def f3(x1, x2, x3, x4, x5, x6, x7):
+            return f_neu(x1, x2, x3, x4) + (x5**2) + 0.3 * x6 - 0.1 * x7**3
+
+        @staticmethod
+        def f_hv(X):
+            y = []
+            for x in X:
+                if x[0] == 1:
+                    y.append(f1(x[1], x[2], x[3], x[4], x[5]))
+                elif x[0] == 2:
+                    y.append(f2(x[1], x[2], x[3], x[4], x[5], x[6]))
+                elif x[0] == 3:
+                    y.append(f3(x[1], x[2], x[3], x[4], x[5], x[6], x[7]))
+            return np.array(y)
+
         xlimits = [
             [1, 3],  # meta ord
             [-5, -2],
@@ -522,9 +522,9 @@ class TestEGO(SMTestCase):
             random_state=42,
             categorical_kernel=HOMO_HSPHERE_KERNEL,
         )
-        x_opt, y_opt, dnk, x_data, y_data = ego.optimize(fun=self.f_hv)
+        x_opt, y_opt, dnk, x_data, y_data = ego.optimize(fun=f_hv)
         self.assertAlmostEqual(
-            self.f_hv(np.atleast_2d([3, -5, -5, 256, 0, 0, 0, 5])),
+            f_hv(np.atleast_2d([3, -5, -5, 256, 0, 0, 0, 5])),
             float(y_opt),
             delta=15,
         )

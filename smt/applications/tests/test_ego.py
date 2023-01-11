@@ -420,7 +420,7 @@ class TestEGO(SMTestCase):
         self.assertAlmostEqual(-15, float(y_opt), delta=5)
 
     def test_ego_mixed_integer_hierarchical(self):
-        @staticmethod
+        
         def f_neu(x1, x2, x3, x4):
             if x4 == 0:
                 return 2 * x1 + x2 - 0.5 * x3
@@ -428,20 +428,12 @@ class TestEGO(SMTestCase):
                 return -x1 + 2 * x2 - 0.5 * x3
             if x4 == 2:
                 return -x1 + x2 + 0.5 * x3
-
-        @staticmethod
         def f1(x1, x2, x3, x4, x5):
             return f_neu(x1, x2, x3, x4) + x5**2
-
-        @staticmethod
         def f2(x1, x2, x3, x4, x5, x6):
-            return f_neu(x1, x2, x3, x4) + (x5**2) + 0.3 * x6
-
-        @staticmethod
+            return f_neu(x1, x2, x3, x4) + (x5**2) + 0.3 * x6      
         def f3(x1, x2, x3, x4, x5, x6, x7):
             return f_neu(x1, x2, x3, x4) + (x5**2) + 0.3 * x6 - 0.1 * x7**3
-
-        @staticmethod
         def f_hv(X):
             y = []
             for x in X:

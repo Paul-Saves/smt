@@ -93,7 +93,7 @@ def compute_unfolded_dimension(xtypes):
     return res
 
 
-def unfold_xlimits_with_continuous_limits(xtypes, xlimits, categorical_kernel=None):
+def unfold_xlimits_with_continuous_limits(xtypes, xlimits, unfold_space=True):
     """
     Expand xlimits to add continuous dimensions for enumerate x features
     Each level of an enumerate gives a new continuous dimension in [0, 1].
@@ -125,7 +125,7 @@ def unfold_xlimits_with_continuous_limits(xtypes, xlimits, categorical_kernel=No
                 xlims.append(xlimits[i])
         elif isinstance(xtyp, tuple) and xtyp[0] == ENUM:
             if xtyp[1] == len(xlimits[i]):
-                if categorical_kernel is None:
+                if unfold_space :
                     xlims.extend(xtyp[1] * [[0, 1]])
                 else:
                     listint = list(map(float, [0, len(xlimits[i])]))
@@ -143,7 +143,7 @@ def unfold_xlimits_with_continuous_limits(xtypes, xlimits, categorical_kernel=No
     return np.array(xlims).astype(float)
 
 
-def cast_to_discrete_values(xtypes, xlimits, categorical_kernel, x):
+def cast_to_discrete_values(xtypes, xlimits, unfold_space, x):
     """
     see MixedIntegerContext.cast_to_discrete_values
     """
@@ -161,7 +161,7 @@ def cast_to_discrete_values(xtypes, xlimits, categorical_kernel, x):
                 ret[:, x_col] = np.round(ret[:, x_col])
             x_col += 1
         elif isinstance(xtyp, tuple) and xtyp[0] == ENUM:
-            if categorical_kernel is None:
+            if unfold_space:
                 # Categorial : The biggest level is selected.
                 xenum = ret[:, x_col : x_col + xtyp[1]]
                 maxx = np.max(xenum, axis=1).reshape((-1, 1))
@@ -177,7 +177,7 @@ def cast_to_discrete_values(xtypes, xlimits, categorical_kernel, x):
     return ret
 
 
-def fold_with_enum_index(xtypes, x, categorical_kernel=None):
+def fold_with_enum_index(xtypes, x):
     """
     see MixedIntegerContext.fold_with_enum_index
     """

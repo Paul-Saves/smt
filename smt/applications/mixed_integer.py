@@ -111,8 +111,8 @@ class MixedIntegerSurrogateModel(SurrogateModel):
         self._xtypes = xtypes
         self._xroles = xroles
         self._xlimits = xlimits
-        self._surrogate.options["xlimits"] = self._xlimits
-
+        if "xlimits" in self._surrogate.options:
+            self._surrogate.options["xlimits"] = self._xlimits
         self._input_in_folded_space = input_in_folded_space
         self.supports = self._surrogate.supports
         self.options["print_global"] = False

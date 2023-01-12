@@ -270,7 +270,7 @@ class TestMixedInteger(unittest.TestCase):
         self.assertEqual(
             np.array_equal(
                 np.array([[2.6, 0, 1, 0, 0, 1, 3]]),
-                cast_to_discrete_values(xtypes, xlimits, None, x),
+                cast_to_discrete_values(xtypes, xlimits, True, x),
             ),
             True,
         )
@@ -286,7 +286,7 @@ class TestMixedInteger(unittest.TestCase):
         self.assertEqual(
             np.array_equal(
                 np.array([[2.6, 0, 1, 0, 0, 1, 4]]),
-                cast_to_discrete_values(xtypes, xlimits, None, x),
+                cast_to_discrete_values(xtypes, xlimits, True, x),
             ),
             True,
         )
@@ -302,7 +302,7 @@ class TestMixedInteger(unittest.TestCase):
         self.assertEqual(
             np.array_equal(
                 np.array([[2.6, 0, 1, 0, 0, 1, 4]]),
-                cast_to_discrete_values(xtypes, xlimits, None, x),
+                cast_to_discrete_values(xtypes, xlimits, True, x),
             ),
             True,
         )
@@ -318,7 +318,7 @@ class TestMixedInteger(unittest.TestCase):
         self.assertEqual(
             np.array_equal(
                 np.array([[2.6, 0, 1, 0, 0, 1, 3.5]]),
-                cast_to_discrete_values(xtypes, xlimits, None, x),
+                cast_to_discrete_values(xtypes, xlimits, True, x),
             ),
             True,
         )

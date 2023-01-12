@@ -311,7 +311,6 @@ def gower_componentwise_distances(X, xlimits, y=None, xtypes=None, xroles=None):
                 ub[k] = i[-1]
             else:
                 maxmetanum = i[-1]
-
         Z_offset = lb
         Z_max = ub
         Z_scale = Z_max - Z_offset
@@ -331,6 +330,7 @@ def gower_componentwise_distances(X, xlimits, y=None, xtypes=None, xroles=None):
     Y_num = Z_num[
         y_index,
     ]
+
     X_norma = np.copy(X)
     Y_norma = np.copy(Y)
     X_norma[:, np.logical_not(cat_features)] = X_num

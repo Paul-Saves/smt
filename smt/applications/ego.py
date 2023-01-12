@@ -135,6 +135,12 @@ class EGO(SurrogateBasedApplication):
             desc="x types specifications: either FLOAT for continuous, INT for integer "
             "or (ENUM n) for categorical doimension with n levels",
         )
+        declare(
+            "xroles",
+            None,
+            types=list,
+            desc="x roles specifications: either NEUTRAL for neutral variables, META for the meta variables and DECREED for the decreed ones",
+        )
         self.options.declare(
             "random_state",
             types=(type(None), int, np.random.RandomState),
@@ -275,6 +281,7 @@ class EGO(SurrogateBasedApplication):
         # Set the model
         self.gpr = self.options["surrogate"]
         self.xlimits = self.options["xlimits"]
+        self.xroles = self.options["xroles"]
 
         # Handle mixed integer optimization
         xtypes = self.options["xtypes"]
@@ -287,7 +294,8 @@ class EGO(SurrogateBasedApplication):
             self.mixint = MixedIntegerContext(
                 xtypes,
                 self.xlimits,
-                work_in_folded_space=self.work_in_folded_space,
+                self.xroles,
+                work_in_folded_space=work_in_folded_space,
                 categorical_kernel=self.options["categorical_kernel"],
             )
 

@@ -295,7 +295,7 @@ class EGO(SurrogateBasedApplication):
                 xtypes,
                 self.xlimits,
                 self.xroles,
-                work_in_folded_space=work_in_folded_space,
+                work_in_folded_space=self.work_in_folded_space,
                 categorical_kernel=self.options["categorical_kernel"],
             )
 

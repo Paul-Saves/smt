@@ -27,11 +27,6 @@ class QP(SurrogateModel):
         declare = self.options.declare
         supports = self.supports
         declare(
-            "xlimits",
-            None,
-            desc="the upper and lower var bounds.",
-        )
-        declare(
             "data_dir",
             values=None,
             types=str,
@@ -78,7 +73,6 @@ class QP(SurrogateModel):
                 self.sol = outputs["sol"]
             else:
                 self._new_train()
-                # outputs['sol'] = self.sol
 
     def _response_surface(self, x):
         """

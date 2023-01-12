@@ -60,7 +60,6 @@ class LS(SurrogateModel):
                 self.sol = outputs["sol"]
             else:
                 self._new_train()
-                # outputs['sol'] = self.sol
 
     def _predict_values(self, x):
         """

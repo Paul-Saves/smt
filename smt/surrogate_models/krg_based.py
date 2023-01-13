@@ -94,9 +94,13 @@ class KrgBased(SurrogateModel):
         declare(
             "xtypes",
             None,
-            types=list,
-            desc="x type specifications: either FLOAT for continuous, INT for integer "
+            desc="x types specifications: either FLOAT for continuous, INT for integer "
             "or (ENUM n) for categorical dimension with n levels",
+        )
+        declare(
+            "xroles",
+            None,
+            desc="x roles specifications: either NEUTRAL for neutral variables, META for the meta variables and DECREED for the decreed ones",
         )
         declare(
             "nugget",
@@ -177,7 +181,10 @@ class KrgBased(SurrogateModel):
 
         if self.options["categorical_kernel"] is not None:
             D, self.ij, X = gower_componentwise_distances(
-                X=X, xlimits=self.options["xlimits"], xtypes=self.options["xtypes"]
+                X=X,
+                xlimits=self.options["xlimits"],
+                xtypes=self.options["xtypes"],
+                xroles=self.options["xroles"],
             )
             self.Lij, self.n_levels = cross_levels(
                 X=self.X_train, ij=self.ij, xtypes=self.options["xtypes"]
@@ -401,6 +408,8 @@ class KrgBased(SurrogateModel):
         if cat_kernel == CONT_RELAX_KERNEL or cat_kernel == GOWER_KERNEL:
             r = _correlation_types[corr](theta, d)
             return r
+        # md = dx[:, 0]
+        # d_cont[md == 1,1] = d_cont[md == 1,1] * 0
 
         theta_cont = theta[theta_cont_features[:, 0]]
         r_cont = _correlation_types[corr](theta_cont, d_cont)
@@ -623,7 +632,6 @@ class KrgBased(SurrogateModel):
             C = linalg.cholesky(R, lower=True)
         except (linalg.LinAlgError, ValueError) as e:
             print("exception : ", e)
-            print(np.linalg.eig(R)[0])
             return reduced_likelihood_function_value, par
 
         # Get generalized least squared solution
@@ -1012,8 +1020,8 @@ class KrgBased(SurrogateModel):
                 y=np.copy(self.X_train),
                 xlimits=self.options["xlimits"],
                 xtypes=self.options["xtypes"],
+                xroles=self.options["xroles"],
             )
-
             d = componentwise_distance(
                 dx,
                 self.options["corr"],
@@ -1150,6 +1158,7 @@ class KrgBased(SurrogateModel):
                 y=np.copy(self.X_train),
                 xlimits=self.options["xlimits"],
                 xtypes=self.options["xtypes"],
+                xroles=self.options["xroles"],
             )
             d = componentwise_distance(
                 dx,

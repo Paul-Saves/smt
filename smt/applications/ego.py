@@ -128,6 +128,12 @@ class EGO(SurrogateBasedApplication):
             types=(KRG, KPLS, KPLSK, GEKPLS, MGP),
             desc="SMT kriging-based surrogate model used internaly",
         )
+        declare(
+            "xroles",
+            None,
+            types=list,
+            desc="x roles specifications: either NEUTRAL for neutral variables, META for the meta variables and DECREED for the decreed ones",
+        )
         self.options.declare(
             "random_state",
             types=(type(None), int, np.random.RandomState),
@@ -268,7 +274,7 @@ class EGO(SurrogateBasedApplication):
         # Set the model
         self.gpr = self.options["surrogate"]
         self.xlimits = self.options["xspecs"]["xlimits"]
-
+        self.xroles = self.options["xroles"]
         # Handle mixed integer optimization
         if self.options["categorical_kernel"] is not None:
             self.work_in_folded_space = True
@@ -279,6 +285,7 @@ class EGO(SurrogateBasedApplication):
             self.categorical_kernel = self.options["categorical_kernel"]
             self.mixint = MixedIntegerContext(
                 xspecs = self.options["xspecs"],
+                self.xroles,
                 work_in_folded_space=self.work_in_folded_space,
                 categorical_kernel=self.options["categorical_kernel"],
             )

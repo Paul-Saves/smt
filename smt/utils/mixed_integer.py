@@ -14,6 +14,10 @@ INT = "int_type"
 ORD = "ord_type"
 ENUM = "enum_type"
 
+NEUTRAL = "neutral_role"
+DECREED = "decreed_role"
+META = "meta_role"
+
 
 def check_xspec_consistency(xspecs):
     if "xlimits" in xspecs:

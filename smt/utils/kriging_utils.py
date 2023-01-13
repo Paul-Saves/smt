@@ -237,7 +237,7 @@ def compute_X_cont(x, xtypes):
     return x[:, np.logical_not(cat_features)], cat_features
 
 
-def gower_componentwise_distances(X, xlimits, y=None, xtypes=None):
+def gower_componentwise_distances(X, xlimits, y=None, xtypes=None, xroles=None):
     """
     Computes the nonzero Gower-distances componentwise between the vectors
     in X.
@@ -251,6 +251,8 @@ def gower_componentwise_distances(X, xlimits, y=None, xtypes=None):
             - The upper and lower var bounds.
     xtypes: np.ndarray [dim]
             -the types (FLOAT,ORD,ENUM) of the input variables
+    xroles: np.ndarray [dim]
+            -the roles (NEUTRAL,META,DECREED) of the input variables
     Returns
     -------
     D: np.ndarray [n_obs * (n_obs - 1) / 2, dim]
@@ -264,6 +266,11 @@ def gower_componentwise_distances(X, xlimits, y=None, xtypes=None):
     X = X.astype(np.float64)
     Xt = X
     X_cont, cat_features = compute_X_cont(Xt, xtypes)
+    if xroles is not None:
+        decreed_features = np.array([(xrole == "decreed_role") for xrole in xroles])
+        meta_features = np.array([(xrole == "meta_role") for xrole in xroles])
+        decreed_num_features = decreed_features[np.logical_not(cat_features)]
+        meta_num_features = meta_features[np.logical_not(cat_features)]
 
     # function checks
     if y is None:
@@ -296,10 +303,14 @@ def gower_componentwise_distances(X, xlimits, y=None, xtypes=None):
     lim = np.array(xlimits, dtype=object)[np.logical_not(cat_features)]
     lb = np.zeros(np.shape(lim)[0])
     ub = np.ones(np.shape(lim)[0])
+    maxmetanum = 1
     if np.shape(lim)[0] > 0:
         for k, i in enumerate(lim):
-            lb[k] = i[0]
-            ub[k] = i[-1]
+            if (xroles is None) or (xroles[k] != "meta_role"):
+                lb[k] = i[0]
+                ub[k] = i[-1]
+            else:
+                maxmetanum = i[-1]
         Z_offset = lb
         Z_max = ub
         Z_scale = Z_max - Z_offset
@@ -325,47 +336,110 @@ def gower_componentwise_distances(X, xlimits, y=None, xtypes=None):
     X_norma[:, np.logical_not(cat_features)] = X_num
     Y_norma[:, np.logical_not(cat_features)] = Y_num
 
-    n_samples, n_features = X_num.shape
-    n_nonzero_cross_dist = n_samples * (n_samples - 1) // 2
-    ij = np.zeros((n_nonzero_cross_dist, 2), dtype=np.int32)
-    D_num = np.zeros((n_nonzero_cross_dist, n_features))
-    ll_1 = 0
+    D = X_norma[:, np.newaxis, :] - Y_norma[np.newaxis, :, :]
+    D = D.reshape((-1, X.shape[1]))
+    D = np.abs(D)
+    D[:, cat_features] = D[:, cat_features] > 0.5
+
+    nx_samples, n_features = X_cat.shape
+    ny_samples, n_features = Y_cat.shape
+    n_nonzero_cross_dist = nx_samples * ny_samples
     if y is None:
+        n_nonzero_cross_dist = nx_samples * (nx_samples - 1) // 2
+    D_cat = np.zeros((n_nonzero_cross_dist, n_features))
+    indD = 0
+    k1max = nx_samples
+    if y is None:
+        k1max = nx_samples - 1
+    for k1 in range(k1max):
+        k2max = ny_samples
+        if y is None:
+            k2max = ny_samples - k1 - 1
+        for k2 in range(k2max):
+            l2 = k2
+            if y is None:
+                l2 = k2 + k1 + 1
+            D_cat[indD] = X_cat[k1] != Y_cat[l2]
+            indD += 1
 
-        for k in range(n_samples - 1):
+    nx_samples, n_features = X_num.shape
+    ny_samples, n_features = Y_num.shape
+    n_nonzero_cross_dist = nx_samples * ny_samples
+    if y is None:
+        n_nonzero_cross_dist = nx_samples * (nx_samples - 1) // 2
+    D_num = np.zeros((n_nonzero_cross_dist, n_features))
+    ij = np.zeros((n_nonzero_cross_dist, 2), dtype=np.int32)
+    ll_1 = 0
+    indD = 0
+    k1max = nx_samples
+    if y is None:
+        k1max = nx_samples - 1
+    for k1 in range(k1max):
+        k2max = ny_samples
+        if y is None:
+            k2max = ny_samples - k1 - 1
             ll_0 = ll_1
-            ll_1 = ll_0 + n_samples - k - 1
-            ij[ll_0:ll_1, 0] = k
-            ij[ll_0:ll_1, 1] = np.arange(k + 1, n_samples)
-            abs_delta = np.abs(X_num[k] - Y_num[(k + 1) : n_samples])
-            D_num[ll_0:ll_1] = abs_delta
+            ll_1 = ll_0 + nx_samples - k1 - 1
+            ij[ll_0:ll_1, 0] = k1
+            ij[ll_0:ll_1, 1] = np.arange(k1 + 1, nx_samples)
+        for k2 in range(k2max):
+            l2 = k2
+            if y is None:
+                l2 = k2 + k1 + 1
+            D_num[indD] = np.abs(X_num[k1] - Y_num[l2])
+            indD += 1
+    if xroles is not None:
+        indD = 0
+        k1max = nx_samples
+        if y is None:
+            k1max = nx_samples - 1
+        for k1 in range(k1max):
+            k2max = ny_samples
+            if y is None:
+                k2max = ny_samples - k1 - 1
+            for k2 in range(k2max):
+                l2 = k2
+                if y is None:
+                    l2 = k2 + k1 + 1
+                abs_delta = np.abs(X_num[k1] - Y_num[l2])
+                abs_delta[decreed_num_features] = (
+                    2
+                    * np.abs(
+                        X_num[k1][decreed_num_features]
+                        - Y_num[l2][decreed_num_features]
+                    )
+                    / (
+                        np.sqrt(1 + X_num[k1][decreed_num_features] ** 2)
+                        * np.sqrt(1 + Y_num[l2][decreed_num_features] ** 2)
+                    )
+                )
+                abs_delta[meta_num_features] = abs_delta[meta_num_features] / maxmetanum
 
-        n_samples, n_features = X_cat.shape
-        n_nonzero_cross_dist = n_samples * (n_samples - 1) // 2
-        D_cat = np.zeros((n_nonzero_cross_dist, n_features))
-        ll_1 = 0
+                #        abs_delta = (
+                #           np.sqrt(2)
+                #          * np.sqrt(1 - np.cos(np.pi/2*np.abs(X_num[k1] - Y_num[l2])) )
+                #     )
+                # This is the meta variable index
+                minmeta = int(
+                    np.min([X_num[k1][meta_num_features], Y_num[l2][meta_num_features]])
+                )
+                maxmeta = int(
+                    np.max([X_num[k1][meta_num_features], Y_num[l2][meta_num_features]])
+                )
+                ind_dec = min((decreed_num_features).nonzero()[0])
+                abs_delta[minmeta + ind_dec :] = abs_delta[minmeta + ind_dec :] * 0 + 1
+                abs_delta[maxmeta + ind_dec :] = abs_delta[maxmeta + ind_dec :] * 0
 
-        for k in range(n_samples - 1):
-            ll_0 = ll_1
-            ll_1 = ll_0 + n_samples - k - 1
-            D_cat[ll_0:ll_1] = np.where(
-                X_cat[k] == Y_cat[(k + 1) : n_samples],
-                np.zeros_like(X_cat[k]),
-                np.ones_like(X_cat[k]),
-            )
+                D_num[indD] = abs_delta
+                indD += 1
 
-        D = np.concatenate((D_cat, D_num), axis=1) * 0
-        D[:, np.logical_not(cat_features)] = D_num
-        D[:, cat_features] = D_cat
-
-        return D, ij.astype(np.int32), X_cont
-    else:
-        D = X_norma[:, np.newaxis, :] - Y_norma[np.newaxis, :, :]
-        D = D.reshape((-1, X.shape[1]))
-        D = np.abs(D)
-        D[:, cat_features] = D[:, cat_features] > 0.5
-
+    D = np.concatenate((D_cat, D_num), axis=1) * 0
+    D[:, np.logical_not(cat_features)] = D_num
+    D[:, cat_features] = D_cat
+    if y is not None:
         return D
+    else:
+        return D, ij.astype(np.int32), X_cont
 
 
 def differences(X, Y):

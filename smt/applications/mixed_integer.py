@@ -17,6 +17,7 @@ from smt.utils.mixed_integer import (
     unfold_with_enum_mask,
     unfold_xlimits_with_continuous_limits,
 )
+from smt.surrogate_models.krg_based import KrgBased
 
 
 class MixedIntegerSamplingMethod(SamplingMethod):
@@ -117,6 +118,13 @@ class MixedIntegerSurrogateModel(SurrogateModel):
         self.supports = self._surrogate.supports
         self.options["print_global"] = False
 
+        if not (isinstance(self._surrogate, KrgBased)):
+            raise ValueError(
+                "Using Mixed integer model with "
+                + str(self._surrogate.name)
+                + " is deprecated. Please opt for a Kriging-based model."
+            )
+
         if "poly" in self._surrogate.options:
             if self._surrogate.options["poly"] != "constant":
                 raise ValueError("constant regression must be used with mixed integer")
@@ -153,7 +161,7 @@ class MixedIntegerSurrogateModel(SurrogateModel):
         else:
             xt2 = xt
         xt2 = cast_to_discrete_values(
-            self._xtypes, self._xlimits, (self._categorical_kernel==None), xt2
+            self._xtypes, self._xlimits, (self._categorical_kernel == None), xt2
         )
         super().set_training_values(xt2, yt)
         self._surrogate.set_training_values(xt2, yt, name)
@@ -173,7 +181,7 @@ class MixedIntegerSurrogateModel(SurrogateModel):
             x2 = xp
         return self._surrogate.predict_values(
             cast_to_discrete_values(
-                self._xtypes, self._xlimits, (self._categorical_kernel==None), x2
+                self._xtypes, self._xlimits, (self._categorical_kernel == None), x2
             )
         )
 
@@ -185,7 +193,7 @@ class MixedIntegerSurrogateModel(SurrogateModel):
             x2 = xp
         return self._surrogate.predict_variances(
             cast_to_discrete_values(
-                self._xtypes, self._xlimits, (self._categorical_kernel==None), x2
+                self._xtypes, self._xlimits, (self._categorical_kernel == None), x2
             )
         )
 
@@ -229,7 +237,7 @@ class MixedIntegerContext(object):
         self._categorical_kernel = categorical_kernel
         self._cat_kernel_comps = cat_kernel_comps
         self._unfolded_xlimits = unfold_xlimits_with_continuous_limits(
-            self._xtypes, xlimits, unfold_space= (  self._categorical_kernel == None )
+            self._xtypes, xlimits, unfold_space=(self._categorical_kernel == None)
         )
         self._work_in_folded_space = work_in_folded_space
 
@@ -290,7 +298,7 @@ class MixedIntegerContext(object):
             feasible evaluation point value in categorical space.
         """
         return cast_to_discrete_values(
-            self._xtypes, self._xlimits, (self._categorical_kernel==None), x
+            self._xtypes, self._xlimits, (self._categorical_kernel == None), x
         )
 
     def fold_with_enum_index(self, x):

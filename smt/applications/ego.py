@@ -285,7 +285,7 @@ class EGO(SurrogateBasedApplication):
             self.categorical_kernel = self.options["categorical_kernel"]
             self.mixint = MixedIntegerContext(
                 xspecs = self.options["xspecs"],
-                self.xroles,
+                xroles = self.xroles,
                 work_in_folded_space=self.work_in_folded_space,
                 categorical_kernel=self.options["categorical_kernel"],
             )

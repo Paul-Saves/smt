@@ -482,14 +482,17 @@ class TestEGO(SMTestCase):
         ]
         xtypes = [ORD, FLOAT, FLOAT, ORD, (ENUM, 3), ORD, ORD, ORD]
         xroles = [META, NEUTRAL, NEUTRAL, NEUTRAL, NEUTRAL, DECREED, DECREED, DECREED]
-
+        xspecs = dict.fromkeys(["xtypes", "xlimits"])
+        xspecs["xtypes"] = xtypes
+        xspecs["xlimits"] = xlimits
         n_doe = 4
 
-        xtypes2 = xtypes[1:]
-        xlimits2 = xlimits[1:]
+        xspecs2 = dict.fromkeys(["xtypes", "xlimits"])
+        xspecs2["xtypes"] = xtypes[1:]
+        xspecs2["xlimits"] = xlimits[1:]
 
         sampling = MixedIntegerSamplingMethod(
-            xtypes2, xlimits2, LHS, criterion="ese", random_state=42
+            xspecs2, LHS, criterion="ese", random_state=42
         )
         x_cont = sampling(3 * n_doe)
 
@@ -531,8 +534,7 @@ class TestEGO(SMTestCase):
             n_iter=n_iter,
             criterion=criterion,
             xdoe=Xt,
-            xtypes=xtypes,
-            xlimits=xlimits,
+            xspecs=xspecs,
             xroles=xroles,
             surrogate=KRG(theta0=[1e-2], n_start=5, corr="abs_exp", print_global=False),
             enable_tunneling=False,

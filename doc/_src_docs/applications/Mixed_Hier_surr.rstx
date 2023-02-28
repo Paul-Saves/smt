@@ -67,7 +67,7 @@ The class ``XSpecs`` implements the roles, variables and types of the variables.
 Example of mixed integer Kriging with hierarchical variables
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. embed-test-print-plot :: smt.applications.tests.test_mixed_integer , TestMixedInteger , run_hierarchical_variables_Goldstein, 80
+.. embed-test-print :: smt.applications.tests.test_mixed_integer , TestMixedInteger , run_hierarchical_variables_Goldstein
 
 
 References

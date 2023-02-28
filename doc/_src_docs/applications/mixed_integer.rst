@@ -35,16 +35,14 @@ Example of mixed-integer LHS sampling method
   from matplotlib import colors
   
   from smt.sampling_methods import LHS
-  from smt.applications.mixed_integer import (
-      FLOAT,
-      ORD,
-      ENUM,
-      MixedIntegerSamplingMethod,
-  )
+  from smt.surrogate_models import FLOAT_TYPE, ENUM_TYPE, XSpecs
+  from smt.applications.mixed_integer import MixedIntegerSamplingMethod
   
-  xtypes = [FLOAT, (ENUM, 2)]
+  xtypes = [FLOAT_TYPE, (ENUM_TYPE, 2)]
   xlimits = [[0.0, 4.0], ["blue", "red"]]
-  sampling = MixedIntegerSamplingMethod(xtypes, xlimits, LHS, criterion="ese")
+  xspecs = XSpecs(xtypes=xtypes, xlimits=xlimits)
+  
+  sampling = MixedIntegerSamplingMethod(LHS, xspecs, criterion="ese")
   
   num = 40
   x = sampling(num)
@@ -90,18 +88,19 @@ Example of mixed-integer context usage
   from matplotlib import colors
   from mpl_toolkits.mplot3d import Axes3D
   
-  from smt.surrogate_models import KRG
   from smt.sampling_methods import LHS, Random
-  from smt.applications.mixed_integer import MixedIntegerContext, FLOAT, ORD, ENUM
+  from smt.surrogate_models import KRG, FLOAT_TYPE, ORD_TYPE, ENUM_TYPE, XSpecs
+  from smt.applications.mixed_integer import MixedIntegerContext
   
-  xtypes = [ORD, FLOAT, (ENUM, 4)]
+  xtypes = [ORD_TYPE, FLOAT_TYPE, (ENUM_TYPE, 4)]
   xlimits = [[0, 5], [0.0, 4.0], ["blue", "red", "green", "yellow"]]
+  xspecs = XSpecs(xtypes=xtypes, xlimits=xlimits)
   
   def ftest(x):
       return (x[:, 0] * x[:, 0] + x[:, 1] * x[:, 1]) * (x[:, 2] + 1)
   
   # context to create consistent DOEs and surrogate
-  mixint = MixedIntegerContext(xtypes, xlimits)
+  mixint = MixedIntegerContext(xspecs=xspecs)
   
   # DOE for training
   lhs = mixint.build_sampling_method(LHS, criterion="ese")
@@ -112,7 +111,7 @@ Example of mixed-integer context usage
   yt = ftest(xt)
   
   # Surrogate
-  sm = mixint.build_surrogate_model(KRG())
+  sm = mixint.build_kriging_model(KRG())
   sm.set_training_values(xt, yt)
   sm.train()
   
@@ -131,7 +130,7 @@ Example of mixed-integer context usage
   
 ::
 
-  DOE point nb = 30
+  DOE point nb = 15
   ___________________________________________________________________________
      
    Evaluation
@@ -173,19 +172,19 @@ Example of mixed-integer Polynomial (QP) surrogate
   import numpy as np
   import matplotlib.pyplot as plt
   
-  from smt.surrogate_models import QP
-  from smt.applications.mixed_integer import MixedIntegerSurrogateModel, ORD
+  from smt.surrogate_models import QP, ORD_TYPE, XSpecs
+  from smt.applications.mixed_integer import MixedIntegerSurrogateModel
   
   xt = np.array([0.0, 1.0, 2.0, 3.0, 4.0])
   yt = np.array([0.0, 1.0, 1.5, 0.5, 1.0])
   
-  # xtypes = [FLOAT, ORD, (ENUM, 3), (ENUM, 2)]
-  # FLOAT means x1 continuous
-  # ORD means x2 ordered
+  # xtypes = [FLOAT_TYPE, ORD_TYPE, (ENUM, 3), (ENUM, 2)]
+  # FLOAT_TYPE means x1 continuous
+  # ORD_TYPE means x2 ordered
   # (ENUM, 3) means x3, x4 & x5 are 3 levels of the same categorical variable
   # (ENUM, 2) means x6 & x7 are 2 levels of the same categorical variable
-  
-  sm = MixedIntegerSurrogateModel(xtypes=[ORD], xlimits=[[0, 4]], surrogate=QP())
+  xspecs = XSpecs(xtypes=[ORD_TYPE], xlimits=[[0, 4]])
+  sm = MixedIntegerSurrogateModel(xspecs=xspecs, surrogate=QP())
   sm.set_training_values(xt, yt)
   sm.train()
   
@@ -236,34 +235,38 @@ Example of mixed-integer Gower Distance model
   import numpy as np
   import matplotlib.pyplot as plt
   
-  from smt.surrogate_models import KRG, KPLS
-  from smt.applications.mixed_integer import (
-      MixedIntegerSurrogateModel,
-      ENUM,
-      ORD,
-      FLOAT,
+  from smt.surrogate_models import (
+      KRG,
+      ENUM_TYPE,
+      FLOAT_TYPE,
+      XSpecs,
       GOWER_KERNEL,
   )
+  from smt.applications.mixed_integer import MixedIntegerKrigingModel
   
   xt1 = np.array([[0, 0.0], [0, 2.0], [0, 4.0]])
   xt2 = np.array([[1, 0.0], [1, 2.0], [1, 3.0]])
   xt3 = np.array([[2, 1.0], [2, 2.0], [2, 4.0]])
   
   xt = np.concatenate((xt1, xt2, xt3), axis=0)
-  xt[:, 1] = xt[:, 1].astype(np.float)
+  xt[:, 1] = xt[:, 1].astype(np.float64)
   yt1 = np.array([0.0, 9.0, 16.0])
   yt2 = np.array([0.0, -4, -13.0])
   yt3 = np.array([-10, 3, 11.0])
   
   yt = np.concatenate((yt1, yt2, yt3), axis=0)
   xlimits = [["Blue", "Red", "Green"], [0.0, 4.0]]
-  xtypes = [(ENUM, 3), FLOAT]
+  xtypes = [(ENUM_TYPE, 3), FLOAT_TYPE]
+  xspecs = XSpecs(xtypes=xtypes, xlimits=xlimits)
   # Surrogate
-  sm = MixedIntegerSurrogateModel(
-      categorical_kernel=GOWER_KERNEL,
-      xtypes=xtypes,
-      xlimits=xlimits,
-      surrogate=KRG(theta0=[1e-1], corr="squar_exp", n_start=20),
+  sm = MixedIntegerKrigingModel(
+      surrogate=KRG(
+          xspecs=xspecs,
+          categorical_kernel=GOWER_KERNEL,
+          theta0=[1e-1],
+          corr="squar_exp",
+          n_start=20,
+      ),
   )
   sm.set_training_values(xt, yt)
   sm.train()
@@ -301,7 +304,7 @@ Example of mixed-integer Gower Distance model
   
   fig, axs = plt.subplots(3, figsize=(8, 6))
   
-  axs[0].plot(xt1[:, 1].astype(np.float), yt1, "o", linestyle="None")
+  axs[0].plot(xt1[:, 1].astype(np.float64), yt1, "o", linestyle="None")
   axs[0].plot(x_cont, y1, color="Blue")
   axs[0].fill_between(
       np.ravel(x_cont),
@@ -317,7 +320,7 @@ Example of mixed-integer Gower Distance model
       bbox_to_anchor=[0, 1],
   )
   axs[1].plot(
-      xt2[:, 1].astype(np.float), yt2, marker="o", color="r", linestyle="None"
+      xt2[:, 1].astype(np.float64), yt2, marker="o", color="r", linestyle="None"
   )
   axs[1].plot(x_cont, y2, color="Red")
   axs[1].fill_between(
@@ -334,7 +337,7 @@ Example of mixed-integer Gower Distance model
       bbox_to_anchor=[0, 1],
   )
   axs[2].plot(
-      xt3[:, 1].astype(np.float), yt3, marker="o", color="r", linestyle="None"
+      xt3[:, 1].astype(np.float64), yt3, marker="o", color="r", linestyle="None"
   )
   axs[2].plot(x_cont, y3, color="Green")
   axs[2].fill_between(
@@ -362,20 +365,9 @@ Example of mixed-integer Gower Distance model
         # eval points. : 100
      
      Predicting ...
-     Predicting - done. Time (sec):  0.0059862
+     Predicting - done. Time (sec):  0.0069809
      
-     Prediction time/pt. (sec) :  0.0000599
-     
-  ___________________________________________________________________________
-     
-   Evaluation
-     
-        # eval points. : 100
-     
-     Predicting ...
-     Predicting - done. Time (sec):  0.0049839
-     
-     Prediction time/pt. (sec) :  0.0000498
+     Prediction time/pt. (sec) :  0.0000698
      
   ___________________________________________________________________________
      
@@ -384,12 +376,23 @@ Example of mixed-integer Gower Distance model
         # eval points. : 100
      
      Predicting ...
-     Predicting - done. Time (sec):  0.0049872
+     Predicting - done. Time (sec):  0.0069809
      
-     Prediction time/pt. (sec) :  0.0000499
+     Prediction time/pt. (sec) :  0.0000698
+     
+  ___________________________________________________________________________
+     
+   Evaluation
+     
+        # eval points. : 100
+     
+     Predicting ...
+     Predicting - done. Time (sec):  0.0079787
+     
+     Prediction time/pt. (sec) :  0.0000798
      
   
-.. figure:: mixed_integer_TestMixedInteger_test_mixed_gower.png
+.. figure:: mixed_integer_TestMixedInteger_run_mixed_gower_example.png
   :scale: 80	 %
   :align: center
 
@@ -401,41 +404,45 @@ Mixed-Integer Surrogate with Group Kernel (Homoscedastic Hypersphere)
 This surrogate model consider that the correlation kernel between the levels of a given variable is a symmetric positive definite matrix. The latter matrix is estimated through an hypersphere parametrization depending on several hyperparameters. To finish with, the data correlation matrix is build as the product of the correlation matrices over the various variables. Details can be found in [1]_ . Note that this model is the only one to consider negative correlations between levels ("blue" can be correlated negatively to "red").
 
 Example of mixed-integer Homoscedastic Hypersphere model
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: python
 
   import numpy as np
   import matplotlib.pyplot as plt
   
-  from smt.surrogate_models import KRG, KPLS
-  from smt.applications.mixed_integer import (
-      MixedIntegerSurrogateModel,
-      ENUM,
-      ORD,
-      FLOAT,
+  from smt.surrogate_models import (
+      KRG,
+      ENUM_TYPE,
+      FLOAT_TYPE,
+      XSpecs,
       HOMO_HSPHERE_KERNEL,
   )
+  from smt.applications.mixed_integer import MixedIntegerKrigingModel
   
   xt1 = np.array([[0, 0.0], [0, 2.0], [0, 4.0]])
   xt2 = np.array([[1, 0.0], [1, 2.0], [1, 3.0]])
   xt3 = np.array([[2, 1.0], [2, 2.0], [2, 4.0]])
   
   xt = np.concatenate((xt1, xt2, xt3), axis=0)
-  xt[:, 1] = xt[:, 1].astype(np.float)
+  xt[:, 1] = xt[:, 1].astype(np.float64)
   yt1 = np.array([0.0, 9.0, 16.0])
   yt2 = np.array([0.0, -4, -13.0])
   yt3 = np.array([-10, 3, 11.0])
   
   yt = np.concatenate((yt1, yt2, yt3), axis=0)
   xlimits = [["Blue", "Red", "Green"], [0.0, 4.0]]
-  xtypes = [(ENUM, 3), FLOAT]
+  xtypes = [(ENUM_TYPE, 3), FLOAT_TYPE]
+  xspecs = XSpecs(xtypes=xtypes, xlimits=xlimits)
   # Surrogate
-  sm = MixedIntegerSurrogateModel(
-      categorical_kernel=HOMO_HSPHERE_KERNEL,
-      xtypes=xtypes,
-      xlimits=xlimits,
-      surrogate=KRG(theta0=[1e-1], corr="squar_exp", n_start=20),
+  sm = MixedIntegerKrigingModel(
+      surrogate=KRG(
+          xspecs=xspecs,
+          categorical_kernel=HOMO_HSPHERE_KERNEL,
+          theta0=[1e-1],
+          corr="squar_exp",
+          n_start=20,
+      ),
   )
   sm.set_training_values(xt, yt)
   sm.train()
@@ -473,7 +480,7 @@ Example of mixed-integer Homoscedastic Hypersphere model
   
   fig, axs = plt.subplots(3, figsize=(8, 6))
   
-  axs[0].plot(xt1[:, 1].astype(np.float), yt1, "o", linestyle="None")
+  axs[0].plot(xt1[:, 1].astype(np.float64), yt1, "o", linestyle="None")
   axs[0].plot(x_cont, y1, color="Blue")
   axs[0].fill_between(
       np.ravel(x_cont),
@@ -489,7 +496,7 @@ Example of mixed-integer Homoscedastic Hypersphere model
       bbox_to_anchor=[0, 1],
   )
   axs[1].plot(
-      xt2[:, 1].astype(np.float), yt2, marker="o", color="r", linestyle="None"
+      xt2[:, 1].astype(np.float64), yt2, marker="o", color="r", linestyle="None"
   )
   axs[1].plot(x_cont, y2, color="Red")
   axs[1].fill_between(
@@ -506,7 +513,7 @@ Example of mixed-integer Homoscedastic Hypersphere model
       bbox_to_anchor=[0, 1],
   )
   axs[2].plot(
-      xt3[:, 1].astype(np.float), yt3, marker="o", color="r", linestyle="None"
+      xt3[:, 1].astype(np.float64), yt3, marker="o", color="r", linestyle="None"
   )
   axs[2].plot(x_cont, y3, color="Green")
   axs[2].fill_between(
@@ -534,20 +541,9 @@ Example of mixed-integer Homoscedastic Hypersphere model
         # eval points. : 100
      
      Predicting ...
-     Predicting - done. Time (sec):  0.0069799
+     Predicting - done. Time (sec):  0.0089760
      
-     Prediction time/pt. (sec) :  0.0000698
-     
-  ___________________________________________________________________________
-     
-   Evaluation
-     
-        # eval points. : 100
-     
-     Predicting ...
-     Predicting - done. Time (sec):  0.0059888
-     
-     Prediction time/pt. (sec) :  0.0000599
+     Prediction time/pt. (sec) :  0.0000898
      
   ___________________________________________________________________________
      
@@ -556,12 +552,23 @@ Example of mixed-integer Homoscedastic Hypersphere model
         # eval points. : 100
      
      Predicting ...
-     Predicting - done. Time (sec):  0.0069888
+     Predicting - done. Time (sec):  0.0089762
      
-     Prediction time/pt. (sec) :  0.0000699
+     Prediction time/pt. (sec) :  0.0000898
+     
+  ___________________________________________________________________________
+     
+   Evaluation
+     
+        # eval points. : 100
+     
+     Predicting ...
+     Predicting - done. Time (sec):  0.0089760
+     
+     Prediction time/pt. (sec) :  0.0000898
      
   
-.. figure:: mixed_integer_TestMixedInteger_test_mixed_homo_hyp.png
+.. figure:: mixed_integer_TestMixedInteger_run_mixed_homo_hyp_example.png
   :scale: 80	 %
   :align: center
  	
@@ -579,34 +586,38 @@ Example of mixed-integer Exponential Homoscedastic Hypersphere model
   import numpy as np
   import matplotlib.pyplot as plt
   
-  from smt.surrogate_models import KRG, KPLS
-  from smt.applications.mixed_integer import (
-      MixedIntegerSurrogateModel,
-      ENUM,
-      ORD,
-      FLOAT,
+  from smt.surrogate_models import (
+      KRG,
+      ENUM_TYPE,
+      FLOAT_TYPE,
+      XSpecs,
       EXP_HOMO_HSPHERE_KERNEL,
   )
+  from smt.applications.mixed_integer import MixedIntegerKrigingModel
   
   xt1 = np.array([[0, 0.0], [0, 2.0], [0, 4.0]])
   xt2 = np.array([[1, 0.0], [1, 2.0], [1, 3.0]])
   xt3 = np.array([[2, 1.0], [2, 2.0], [2, 4.0]])
   
   xt = np.concatenate((xt1, xt2, xt3), axis=0)
-  xt[:, 1] = xt[:, 1].astype(np.float)
+  xt[:, 1] = xt[:, 1].astype(np.float64)
   yt1 = np.array([0.0, 9.0, 16.0])
   yt2 = np.array([0.0, -4, -13.0])
   yt3 = np.array([-10, 3, 11.0])
   
   yt = np.concatenate((yt1, yt2, yt3), axis=0)
   xlimits = [["Blue", "Red", "Green"], [0.0, 4.0]]
-  xtypes = [(ENUM, 3), FLOAT]
+  xtypes = [(ENUM_TYPE, 3), FLOAT_TYPE]
+  xspecs = XSpecs(xtypes=xtypes, xlimits=xlimits)
   # Surrogate
-  sm = MixedIntegerSurrogateModel(
-      categorical_kernel=EXP_HOMO_HSPHERE_KERNEL,
-      xtypes=xtypes,
-      xlimits=xlimits,
-      surrogate=KRG(theta0=[1e-1], corr="squar_exp", n_start=20),
+  sm = MixedIntegerKrigingModel(
+      surrogate=KRG(
+          xspecs=xspecs,
+          theta0=[1e-1],
+          corr="squar_exp",
+          n_start=20,
+          categorical_kernel=EXP_HOMO_HSPHERE_KERNEL,
+      ),
   )
   sm.set_training_values(xt, yt)
   sm.train()
@@ -644,7 +655,7 @@ Example of mixed-integer Exponential Homoscedastic Hypersphere model
   
   fig, axs = plt.subplots(3, figsize=(8, 6))
   
-  axs[0].plot(xt1[:, 1].astype(np.float), yt1, "o", linestyle="None")
+  axs[0].plot(xt1[:, 1].astype(np.float64), yt1, "o", linestyle="None")
   axs[0].plot(x_cont, y1, color="Blue")
   axs[0].fill_between(
       np.ravel(x_cont),
@@ -660,7 +671,7 @@ Example of mixed-integer Exponential Homoscedastic Hypersphere model
       bbox_to_anchor=[0, 1],
   )
   axs[1].plot(
-      xt2[:, 1].astype(np.float), yt2, marker="o", color="r", linestyle="None"
+      xt2[:, 1].astype(np.float64), yt2, marker="o", color="r", linestyle="None"
   )
   axs[1].plot(x_cont, y2, color="Red")
   axs[1].fill_between(
@@ -677,7 +688,7 @@ Example of mixed-integer Exponential Homoscedastic Hypersphere model
       bbox_to_anchor=[0, 1],
   )
   axs[2].plot(
-      xt3[:, 1].astype(np.float), yt3, marker="o", color="r", linestyle="None"
+      xt3[:, 1].astype(np.float64), yt3, marker="o", color="r", linestyle="None"
   )
   axs[2].plot(x_cont, y3, color="Green")
   axs[2].fill_between(
@@ -705,20 +716,9 @@ Example of mixed-integer Exponential Homoscedastic Hypersphere model
         # eval points. : 100
      
      Predicting ...
-     Predicting - done. Time (sec):  0.0063519
+     Predicting - done. Time (sec):  0.0089753
      
-     Prediction time/pt. (sec) :  0.0000635
-     
-  ___________________________________________________________________________
-     
-   Evaluation
-     
-        # eval points. : 100
-     
-     Predicting ...
-     Predicting - done. Time (sec):  0.0069222
-     
-     Prediction time/pt. (sec) :  0.0000692
+     Prediction time/pt. (sec) :  0.0000898
      
   ___________________________________________________________________________
      
@@ -727,12 +727,23 @@ Example of mixed-integer Exponential Homoscedastic Hypersphere model
         # eval points. : 100
      
      Predicting ...
-     Predicting - done. Time (sec):  0.0060115
+     Predicting - done. Time (sec):  0.0089767
      
-     Prediction time/pt. (sec) :  0.0000601
+     Prediction time/pt. (sec) :  0.0000898
+     
+  ___________________________________________________________________________
+     
+   Evaluation
+     
+        # eval points. : 100
+     
+     Predicting ...
+     Predicting - done. Time (sec):  0.0089762
+     
+     Prediction time/pt. (sec) :  0.0000898
      
   
-.. figure:: mixed_integer_TestMixedInteger_test_mixed_homo_gaussian.png
+.. figure:: mixed_integer_TestMixedInteger_run_mixed_homo_gaussian_example.png
   :scale: 80	 %
   :align: center
 

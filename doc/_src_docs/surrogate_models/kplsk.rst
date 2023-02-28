@@ -85,7 +85,7 @@ Usage
    Training
      
      Training ...
-     Training - done. Time (sec):  0.0538588
+     Training - done. Time (sec):  0.0598407
   ___________________________________________________________________________
      
    Evaluation
@@ -93,9 +93,9 @@ Usage
         # eval points. : 100
      
      Predicting ...
-     Predicting - done. Time (sec):  0.0009999
+     Predicting - done. Time (sec):  0.0000000
      
-     Prediction time/pt. (sec) :  0.0000100
+     Prediction time/pt. (sec) :  0.0000000
      
   ___________________________________________________________________________
      
@@ -163,14 +163,9 @@ Options
      -  Correlation function type
   *  -  categorical_kernel
      -  None
-     -  ['gower', 'homoscedastic_gaussian_matrix_kernel', 'full_gaussian_matrix_kernel']
-     -  ['str']
+     -  ['continuous_relaxation_matrix_kernel', 'gower_matrix_kernel', 'exponential_homoscedastic_matrix_kernel', 'homoscedastic_matrix_kernel']
+     -  None
      -  The kernel to use for categorical inputs. Only for non continuous Kriging
-  *  -  xtypes
-     -  None
-     -  None
-     -  ['list']
-     -  x type specifications: either FLOAT for continuous, INT for integer or (ENUM n) for categorical dimension with n levels
   *  -  nugget
      -  2.220446049250313e-14
      -  None
@@ -216,6 +211,15 @@ Options
      -  None
      -  ['int']
      -  number of optimizer runs (multistart method)
+  *  -  xspecs
+     -  None
+     -  None
+     -  ['XSpecs']
+     -  xspecs : x specifications including
+                xtypes: x types list
+                    x types specification: list of either FLOAT, ORD or (ENUM, n) spec.
+                xlimits: array-like
+                    bounds of x features
   *  -  n_comp
      -  1
      -  None
@@ -231,3 +235,8 @@ Options
      -  None
      -  ['float']
      -  n_comp evaluation treshold for Wold's R criterion
+  *  -  cat_kernel_comps
+     -  None
+     -  None
+     -  ['list']
+     -  Number of components for PLS categorical kernel

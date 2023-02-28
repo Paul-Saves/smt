@@ -4,7 +4,7 @@
    contain the root `toctree` directive.
 
 .. image:: logos_band.png
-  :height: 130
+  :height: 120
   :width:  1250
 
 SMT: Surrogate Modeling Toolbox

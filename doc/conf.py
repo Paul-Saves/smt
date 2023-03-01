@@ -97,10 +97,10 @@ html_theme = "bizstyle"
 #
 
 html_theme_options = {
-    'rightsidebar': False,
-    'sidebarwidth' : 250,	
-    'body_min_width' : 1100,
-    'body_max_width' : 1100, 
+    "rightsidebar": False,
+    "sidebarwidth": 250,
+    "body_min_width": 1100,
+    "body_max_width": 1100,
 }
 
 html_logo = "smt_logo.png"

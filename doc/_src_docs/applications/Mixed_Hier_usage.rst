@@ -72,10 +72,10 @@ Example of mixed integer LHS sampling method
   from matplotlib import colors
   
   from smt.sampling_methods import LHS
-  from smt.surrogate_models import FLOAT_TYPE, ENUM_TYPE, XSpecs
+  from smt.surrogate_models import XType, XSpecs
   from smt.applications.mixed_integer import MixedIntegerSamplingMethod
   
-  xtypes = [FLOAT_TYPE, (ENUM_TYPE, 2)]
+  xtypes = [XType.FLOAT, (XType.ENUM, 2)]
   xlimits = [[0.0, 4.0], ["blue", "red"]]
   xspecs = XSpecs(xtypes=xtypes, xlimits=xlimits)
   
@@ -126,10 +126,10 @@ Example of mixed integer context usage
   from mpl_toolkits.mplot3d import Axes3D
   
   from smt.sampling_methods import LHS, Random
-  from smt.surrogate_models import KRG, FLOAT_TYPE, ORD_TYPE, ENUM_TYPE, XSpecs
+  from smt.surrogate_models import KRG, XType, XSpecs
   from smt.applications.mixed_integer import MixedIntegerContext
   
-  xtypes = [ORD_TYPE, FLOAT_TYPE, (ENUM_TYPE, 4)]
+  xtypes = [XType.ORD, XType.FLOAT, (XType.ENUM, 4)]
   xlimits = [[0, 5], [0.0, 4.0], ["blue", "red", "green", "yellow"]]
   xspecs = XSpecs(xtypes=xtypes, xlimits=xlimits)
   

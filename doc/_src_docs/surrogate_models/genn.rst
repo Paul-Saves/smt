@@ -107,27 +107,27 @@ Usage
    Training
      
      Training ...
-  epoch = 0, mini-batch = 0, avg cost = 16.086
-  epoch = 1, mini-batch = 0, avg cost =  0.769
-  epoch = 2, mini-batch = 0, avg cost =  0.644
-  epoch = 3, mini-batch = 0, avg cost =  0.614
-  epoch = 4, mini-batch = 0, avg cost =  0.601
-  epoch = 5, mini-batch = 0, avg cost =  0.592
-  epoch = 6, mini-batch = 0, avg cost =  0.584
-  epoch = 7, mini-batch = 0, avg cost =  0.577
-  epoch = 8, mini-batch = 0, avg cost =  0.571
-  epoch = 9, mini-batch = 0, avg cost =  0.565
-  epoch = 10, mini-batch = 0, avg cost =  0.562
-  epoch = 11, mini-batch = 0, avg cost =  0.559
-  epoch = 12, mini-batch = 0, avg cost =  0.555
-  epoch = 13, mini-batch = 0, avg cost =  0.553
-  epoch = 14, mini-batch = 0, avg cost =  0.551
-  epoch = 15, mini-batch = 0, avg cost =  0.550
-  epoch = 16, mini-batch = 0, avg cost =  0.550
-  epoch = 17, mini-batch = 0, avg cost =  0.549
-  epoch = 18, mini-batch = 0, avg cost =  0.549
-  epoch = 19, mini-batch = 0, avg cost =  0.549
-     Training - done. Time (sec):  3.6253400
+  epoch = 0, mini-batch = 0, avg cost = 19.214
+  epoch = 1, mini-batch = 0, avg cost =  1.028
+  epoch = 2, mini-batch = 0, avg cost =  0.813
+  epoch = 3, mini-batch = 0, avg cost =  0.738
+  epoch = 4, mini-batch = 0, avg cost =  0.705
+  epoch = 5, mini-batch = 0, avg cost =  0.690
+  epoch = 6, mini-batch = 0, avg cost =  0.679
+  epoch = 7, mini-batch = 0, avg cost =  0.667
+  epoch = 8, mini-batch = 0, avg cost =  0.657
+  epoch = 9, mini-batch = 0, avg cost =  0.650
+  epoch = 10, mini-batch = 0, avg cost =  0.642
+  epoch = 11, mini-batch = 0, avg cost =  0.631
+  epoch = 12, mini-batch = 0, avg cost =  0.622
+  epoch = 13, mini-batch = 0, avg cost =  0.613
+  epoch = 14, mini-batch = 0, avg cost =  0.604
+  epoch = 15, mini-batch = 0, avg cost =  0.597
+  epoch = 16, mini-batch = 0, avg cost =  0.590
+  epoch = 17, mini-batch = 0, avg cost =  0.585
+  epoch = 18, mini-batch = 0, avg cost =  0.581
+  epoch = 19, mini-batch = 0, avg cost =  0.579
+     Training - done. Time (sec):  3.4438088
   ___________________________________________________________________________
      
    Evaluation

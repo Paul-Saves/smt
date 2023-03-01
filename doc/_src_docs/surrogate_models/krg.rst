@@ -131,7 +131,7 @@ Example 1
    Training
      
      Training ...
-     Training - done. Time (sec):  0.0339103
+     Training - done. Time (sec):  0.0349092
   ___________________________________________________________________________
      
    Evaluation
@@ -150,9 +150,9 @@ Example 1
         # eval points. : 5
      
      Predicting ...
-     Predicting - done. Time (sec):  0.0009971
+     Predicting - done. Time (sec):  0.0000000
      
-     Prediction time/pt. (sec) :  0.0001994
+     Prediction time/pt. (sec) :  0.0000000
      
   
 .. figure:: krg_Test_test_krg.png
@@ -167,7 +167,7 @@ Example 2 with mixed variables
   import numpy as np
   import matplotlib.pyplot as plt
   
-  from smt.surrogate_models import KRG, ORD_TYPE
+  from smt.surrogate_models import KRG, XType
   from smt.applications.mixed_integer import MixedIntegerKrigingModel
   from smt.utils.kriging import XSpecs
   
@@ -179,7 +179,7 @@ Example 2 with mixed variables
   # ORD means x2 integer
   # (ENUM, 3) means x3, x4 & x5 are 3 levels of the same categorical variable
   # (ENUM, 2) means x6 & x7 are 2 levels of the same categorical variable
-  xspecs = XSpecs(xtypes=[ORD_TYPE], xlimits=[[0, 4]])
+  xspecs = XSpecs(xtypes=[XType.ORD], xlimits=[[0, 4]])
   sm = MixedIntegerKrigingModel(surrogate=KRG(xspecs=xspecs, theta0=[1e-2]))
   sm.set_training_values(xt, yt)
   sm.train()
@@ -217,7 +217,7 @@ Example 2 with mixed variables
         # eval points. : 500
      
      Predicting ...
-     Predicting - done. Time (sec):  0.0010023
+     Predicting - done. Time (sec):  0.0009968
      
      Prediction time/pt. (sec) :  0.0000020
      
@@ -276,7 +276,7 @@ Options
      -  Correlation function type
   *  -  categorical_kernel
      -  None
-     -  ['continuous_relaxation_matrix_kernel', 'gower_matrix_kernel', 'exponential_homoscedastic_matrix_kernel', 'homoscedastic_matrix_kernel']
+     -  [<MixIntKernelType.CONT_RELAX: 3>, <MixIntKernelType.GOWER: 4>, <MixIntKernelType.EXP_HOMO_HSPHERE: 1>, <MixIntKernelType.HOMO_HSPHERE: 2>]
      -  None
      -  The kernel to use for categorical inputs. Only for non continuous Kriging
   *  -  nugget

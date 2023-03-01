@@ -83,7 +83,7 @@ Usage
    Training
      
      Training ...
-     Training - done. Time (sec):  0.0388956
+     Training - done. Time (sec):  0.0339091
   ___________________________________________________________________________
      
    Evaluation
@@ -117,7 +117,6 @@ Usage with an automatic number of components
 .. code-block:: python
 
   import numpy as np
-  import matplotlib.pyplot as plt
   from smt.surrogate_models import KPLS
   from smt.problems import TensorProduct
   from smt.sampling_methods import LHS
@@ -159,7 +158,7 @@ Usage with an automatic number of components
    Training
      
      Training ...
-     Training - done. Time (sec):  2.6918037
+     Training - done. Time (sec):  2.7097960
   
    The model automatically choose 3 components.
   ___________________________________________________________________________
@@ -227,7 +226,7 @@ Options
      -  Correlation function type
   *  -  categorical_kernel
      -  None
-     -  ['continuous_relaxation_matrix_kernel', 'gower_matrix_kernel', 'exponential_homoscedastic_matrix_kernel', 'homoscedastic_matrix_kernel']
+     -  [<MixIntKernelType.CONT_RELAX: 3>, <MixIntKernelType.GOWER: 4>, <MixIntKernelType.EXP_HOMO_HSPHERE: 1>, <MixIntKernelType.HOMO_HSPHERE: 2>]
      -  None
      -  The kernel to use for categorical inputs. Only for non continuous Kriging
   *  -  nugget

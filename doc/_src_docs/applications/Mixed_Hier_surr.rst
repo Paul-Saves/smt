@@ -24,18 +24,18 @@ Example of mixed integer Polynomial (QP) surrogate
   import numpy as np
   import matplotlib.pyplot as plt
   
-  from smt.surrogate_models import QP, ORD_TYPE, XSpecs
+  from smt.surrogate_models import QP, XType, XSpecs
   from smt.applications.mixed_integer import MixedIntegerSurrogateModel
   
   xt = np.array([0.0, 1.0, 2.0, 3.0, 4.0])
   yt = np.array([0.0, 1.0, 1.5, 0.5, 1.0])
   
-  # xtypes = [FLOAT_TYPE, ORD_TYPE, (ENUM, 3), (ENUM, 2)]
-  # FLOAT_TYPE means x1 continuous
-  # ORD_TYPE means x2 ordered
+  # xtypes = [XType.FLOAT, XType.ORD, (ENUM, 3), (ENUM, 2)]
+  # XType.FLOAT means x1 continuous
+  # XType.ORD means x2 ordered
   # (ENUM, 3) means x3, x4 & x5 are 3 levels of the same categorical variable
   # (ENUM, 2) means x6 & x7 are 2 levels of the same categorical variable
-  xspecs = XSpecs(xtypes=[ORD_TYPE], xlimits=[[0, 4]])
+  xspecs = XSpecs(xtypes=[XType.ORD], xlimits=[[0, 4]])
   sm = MixedIntegerSurrogateModel(xspecs=xspecs, surrogate=QP())
   sm.set_training_values(xt, yt)
   sm.train()
@@ -87,13 +87,7 @@ Example of mixed integer Gower Distance model
   import numpy as np
   import matplotlib.pyplot as plt
   
-  from smt.surrogate_models import (
-      KRG,
-      ENUM_TYPE,
-      FLOAT_TYPE,
-      XSpecs,
-      GOWER_KERNEL,
-  )
+  from smt.surrogate_models import KRG, XType, XSpecs, MixIntKernelType
   from smt.applications.mixed_integer import MixedIntegerKrigingModel
   
   xt1 = np.array([[0, 0.0], [0, 2.0], [0, 4.0]])
@@ -108,13 +102,13 @@ Example of mixed integer Gower Distance model
   
   yt = np.concatenate((yt1, yt2, yt3), axis=0)
   xlimits = [["Blue", "Red", "Green"], [0.0, 4.0]]
-  xtypes = [(ENUM_TYPE, 3), FLOAT_TYPE]
+  xtypes = [(XType.ENUM, 3), XType.FLOAT]
   xspecs = XSpecs(xtypes=xtypes, xlimits=xlimits)
   # Surrogate
   sm = MixedIntegerKrigingModel(
       surrogate=KRG(
           xspecs=xspecs,
-          categorical_kernel=GOWER_KERNEL,
+          categorical_kernel=MixIntKernelType.GOWER,
           theta0=[1e-1],
           corr="squar_exp",
           n_start=20,
@@ -228,7 +222,7 @@ Example of mixed integer Gower Distance model
         # eval points. : 100
      
      Predicting ...
-     Predicting - done. Time (sec):  0.0079787
+     Predicting - done. Time (sec):  0.0079789
      
      Prediction time/pt. (sec) :  0.0000798
      
@@ -239,9 +233,9 @@ Example of mixed integer Gower Distance model
         # eval points. : 100
      
      Predicting ...
-     Predicting - done. Time (sec):  0.0069811
+     Predicting - done. Time (sec):  0.0079999
      
-     Prediction time/pt. (sec) :  0.0000698
+     Prediction time/pt. (sec) :  0.0000800
      
   
 .. figure:: Mixed_Hier_surr_TestMixedInteger_run_mixed_gower_example.png
@@ -262,13 +256,7 @@ Example of mixed integer Homoscedastic Hypersphere model
   import numpy as np
   import matplotlib.pyplot as plt
   
-  from smt.surrogate_models import (
-      KRG,
-      ENUM_TYPE,
-      FLOAT_TYPE,
-      XSpecs,
-      HOMO_HSPHERE_KERNEL,
-  )
+  from smt.surrogate_models import KRG, XType, XSpecs, MixIntKernelType
   from smt.applications.mixed_integer import MixedIntegerKrigingModel
   
   xt1 = np.array([[0, 0.0], [0, 2.0], [0, 4.0]])
@@ -283,13 +271,13 @@ Example of mixed integer Homoscedastic Hypersphere model
   
   yt = np.concatenate((yt1, yt2, yt3), axis=0)
   xlimits = [["Blue", "Red", "Green"], [0.0, 4.0]]
-  xtypes = [(ENUM_TYPE, 3), FLOAT_TYPE]
+  xtypes = [(XType.ENUM, 3), XType.FLOAT]
   xspecs = XSpecs(xtypes=xtypes, xlimits=xlimits)
   # Surrogate
   sm = MixedIntegerKrigingModel(
       surrogate=KRG(
           xspecs=xspecs,
-          categorical_kernel=HOMO_HSPHERE_KERNEL,
+          categorical_kernel=MixIntKernelType.HOMO_HSPHERE,
           theta0=[1e-1],
           corr="squar_exp",
           n_start=20,
@@ -392,7 +380,18 @@ Example of mixed integer Homoscedastic Hypersphere model
         # eval points. : 100
      
      Predicting ...
-     Predicting - done. Time (sec):  0.0089772
+     Predicting - done. Time (sec):  0.0099409
+     
+     Prediction time/pt. (sec) :  0.0000994
+     
+  ___________________________________________________________________________
+     
+   Evaluation
+     
+        # eval points. : 100
+     
+     Predicting ...
+     Predicting - done. Time (sec):  0.0089757
      
      Prediction time/pt. (sec) :  0.0000898
      
@@ -403,18 +402,7 @@ Example of mixed integer Homoscedastic Hypersphere model
         # eval points. : 100
      
      Predicting ...
-     Predicting - done. Time (sec):  0.0089755
-     
-     Prediction time/pt. (sec) :  0.0000898
-     
-  ___________________________________________________________________________
-     
-   Evaluation
-     
-        # eval points. : 100
-     
-     Predicting ...
-     Predicting - done. Time (sec):  0.0089846
+     Predicting - done. Time (sec):  0.0089767
      
      Prediction time/pt. (sec) :  0.0000898
      
@@ -437,13 +425,7 @@ Example of mixed integer Exponential Homoscedastic Hypersphere model
   import numpy as np
   import matplotlib.pyplot as plt
   
-  from smt.surrogate_models import (
-      KRG,
-      ENUM_TYPE,
-      FLOAT_TYPE,
-      XSpecs,
-      EXP_HOMO_HSPHERE_KERNEL,
-  )
+  from smt.surrogate_models import KRG, XType, XSpecs, MixIntKernelType
   from smt.applications.mixed_integer import MixedIntegerKrigingModel
   
   xt1 = np.array([[0, 0.0], [0, 2.0], [0, 4.0]])
@@ -458,7 +440,7 @@ Example of mixed integer Exponential Homoscedastic Hypersphere model
   
   yt = np.concatenate((yt1, yt2, yt3), axis=0)
   xlimits = [["Blue", "Red", "Green"], [0.0, 4.0]]
-  xtypes = [(ENUM_TYPE, 3), FLOAT_TYPE]
+  xtypes = [(XType.ENUM, 3), XType.FLOAT]
   xspecs = XSpecs(xtypes=xtypes, xlimits=xlimits)
   # Surrogate
   sm = MixedIntegerKrigingModel(
@@ -467,7 +449,7 @@ Example of mixed integer Exponential Homoscedastic Hypersphere model
           theta0=[1e-1],
           corr="squar_exp",
           n_start=20,
-          categorical_kernel=EXP_HOMO_HSPHERE_KERNEL,
+          categorical_kernel=MixIntKernelType.EXP_HOMO_HSPHERE,
       ),
   )
   sm.set_training_values(xt, yt)
@@ -567,31 +549,31 @@ Example of mixed integer Exponential Homoscedastic Hypersphere model
         # eval points. : 100
      
      Predicting ...
-     Predicting - done. Time (sec):  0.0089817
+     Predicting - done. Time (sec):  0.0099738
+     
+     Prediction time/pt. (sec) :  0.0000997
+     
+  ___________________________________________________________________________
+     
+   Evaluation
+     
+        # eval points. : 100
+     
+     Predicting ...
+     Predicting - done. Time (sec):  0.0099735
+     
+     Prediction time/pt. (sec) :  0.0000997
+     
+  ___________________________________________________________________________
+     
+   Evaluation
+     
+        # eval points. : 100
+     
+     Predicting ...
+     Predicting - done. Time (sec):  0.0089765
      
      Prediction time/pt. (sec) :  0.0000898
-     
-  ___________________________________________________________________________
-     
-   Evaluation
-     
-        # eval points. : 100
-     
-     Predicting ...
-     Predicting - done. Time (sec):  0.0089638
-     
-     Prediction time/pt. (sec) :  0.0000896
-     
-  ___________________________________________________________________________
-     
-   Evaluation
-     
-        # eval points. : 100
-     
-     Predicting ...
-     Predicting - done. Time (sec):  0.0089500
-     
-     Prediction time/pt. (sec) :  0.0000895
      
   
 .. figure:: Mixed_Hier_surr_TestMixedInteger_run_mixed_homo_gaussian_example.png
@@ -619,18 +601,19 @@ Example of mixed integer Kriging with hierarchical variables
   from smt.sampling_methods import LHS
   from smt.surrogate_models import (
       KRG,
-      FLOAT_TYPE,
-      ORD_TYPE,
-      ENUM_TYPE,
-      NEUTRAL_ROLE,
-      META_ROLE,
-      DECREED_ROLE,
-      HOMO_HSPHERE_KERNEL,
+      KPLS,
+      QP,
+      XType,
+      XRole,
+      MixIntKernelType,
   )
-  def f_hv(X):      
+  
+  def f_hv(X):
       import numpy as np
+  
       def H(x1, x2, x3, x4, z3, z4, x5, cos_term):
           import numpy as np
+  
           h = (
               53.3108
               + 0.184901 * x1
@@ -655,7 +638,7 @@ Example of mixed integer Kriging with hierarchical variables
           if cos_term:
               h += 5.0 * np.cos(2.0 * np.pi * (x5 / 100.0)) - 2.0
           return h
-      
+  
       def f1(x1, x2, z1, z2, z3, z4, x5, cos_term):
           c1 = z2 == 0
           c2 = z2 == 1
@@ -686,6 +669,7 @@ Example of mixed integer Kriging with hierarchical variables
               )
           )
           return y
+  
       def f2(x1, x2, x3, z2, z3, z4, x5, cos_term):
           c1 = z2 == 0
           c2 = z2 == 1
@@ -708,7 +692,7 @@ Example of mixed integer Kriging with hierarchical variables
               + c2 * H(x1, x2, 50, x4, z3, z4, x5, cos_term)
               + c3 * H(x1, x2, 80, x4, z3, z4, x5, cos_term)
           )
-          return y     
+          return y
   
       y = []
       for x in X:
@@ -744,32 +728,32 @@ Example of mixed integer Kriging with hierarchical variables
       [0, 2],  # 9
   ]
   xroles = [
-      META_ROLE,
-      NEUTRAL_ROLE,
-      NEUTRAL_ROLE,
-      NEUTRAL_ROLE,
-      DECREED_ROLE,
-      DECREED_ROLE,
-      NEUTRAL_ROLE,
-      DECREED_ROLE,
-      DECREED_ROLE,
-      NEUTRAL_ROLE,
-      NEUTRAL_ROLE,
+      XRole.META,
+      XRole.NEUTRAL,
+      XRole.NEUTRAL,
+      XRole.NEUTRAL,
+      XRole.DECREED,
+      XRole.DECREED,
+      XRole.NEUTRAL,
+      XRole.DECREED,
+      XRole.DECREED,
+      XRole.NEUTRAL,
+      XRole.NEUTRAL,
   ]
   # z or x, cos?;          x1,x2,          x3, x4,        x5:cos,       z1,z2;            exp1,exp2
   
   xtypes = [
-      (ENUM_TYPE, 4),
-      ORD_TYPE,
-      FLOAT_TYPE,
-      FLOAT_TYPE,
-      FLOAT_TYPE,
-      FLOAT_TYPE,
-      FLOAT_TYPE,
-      ORD_TYPE,
-      ORD_TYPE,
-      ORD_TYPE,
-      ORD_TYPE,
+      (XType.ENUM, 4),
+      XType.ORD,
+      XType.FLOAT,
+      XType.FLOAT,
+      XType.FLOAT,
+      XType.FLOAT,
+      XType.FLOAT,
+      XType.ORD,
+      XType.ORD,
+      XType.ORD,
+      XType.ORD,
   ]
   xspecs = XSpecs(xtypes=xtypes, xlimits=xlimits, xroles=xroles)
   n_doe = 15
@@ -782,7 +766,7 @@ Example of mixed integer Kriging with hierarchical variables
   sm = MixedIntegerKrigingModel(
       surrogate=KRG(
           xspecs=xspecs,
-          categorical_kernel=HOMO_HSPHERE_KERNEL,
+          categorical_kernel=MixIntKernelType.HOMO_HSPHERE,
           theta0=[1e-2],
           corr="abs_exp",
           n_start=5,
@@ -805,9 +789,9 @@ Example of mixed integer Kriging with hierarchical variables
         # eval points. : 15
      
      Predicting ...
-     Predicting - done. Time (sec):  0.0159233
+     Predicting - done. Time (sec):  0.0159583
      
-     Prediction time/pt. (sec) :  0.0010616
+     Prediction time/pt. (sec) :  0.0010639
      
   
 

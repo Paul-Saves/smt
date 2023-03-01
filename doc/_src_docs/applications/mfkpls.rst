@@ -108,7 +108,7 @@ Usage
    Training
      
      Training ...
-     Training - done. Time (sec):  0.1016924
+     Training - done. Time (sec):  0.0977678
   ___________________________________________________________________________
      
    Evaluation
@@ -189,11 +189,6 @@ Options
      -  ['continuous_relaxation_matrix_kernel', 'gower_matrix_kernel', 'exponential_homoscedastic_matrix_kernel', 'homoscedastic_matrix_kernel']
      -  None
      -  The kernel to use for categorical inputs. Only for non continuous Kriging
-  *  -  xtypes
-     -  None
-     -  None
-     -  ['list']
-     -  x type specifications: either FLOAT for continuous, INT for integer or (ENUM n) for categorical dimension with n levels
   *  -  nugget
      -  2.220446049250313e-14
      -  None
@@ -239,6 +234,15 @@ Options
      -  None
      -  ['int']
      -  number of optimizer runs (multistart method)
+  *  -  xspecs
+     -  None
+     -  None
+     -  ['XSpecs']
+     -  xspecs : x specifications including
+                xtypes: x types list
+                    x types specification: list of either FLOAT, ORD or (ENUM, n) spec.
+                xlimits: array-like
+                    bounds of x features
   *  -  rho_regr
      -  constant
      -  ['constant', 'linear', 'quadratic']

@@ -445,10 +445,8 @@ Usage with mixed variable
   from smt.applications import EGO
   from smt.applications.mixed_integer import MixedIntegerContext
   from smt.surrogate_models import (
-      FLOAT_TYPE,
-      ENUM_TYPE,
-      ORD_TYPE,
-      GOWER_KERNEL,
+      XType,
+      MixIntKernelType,
       XSpecs,
   )
   import matplotlib.pyplot as plt
@@ -482,7 +480,7 @@ Usage with mixed variable
       return y.reshape((-1, 1))
   
   n_iter = 15
-  xtypes = [FLOAT_TYPE, (ENUM_TYPE, 3), (ENUM_TYPE, 2), ORD_TYPE]
+  xtypes = [XType.FLOAT, (XType.ENUM, 3), (XType.ENUM, 2), XType.ORD]
   xlimits = np.array(
       [[-5, 5], ["red", "green", "blue"], ["square", "circle"], [0, 2]],
       dtype="object",
@@ -491,7 +489,9 @@ Usage with mixed variable
   
   criterion = "EI"  #'EI' or 'SBO' or 'LCB'
   qEI = "KBRand"
-  sm = KRG(xspecs=xspecs, categorical_kernel=GOWER_KERNEL, print_global=False)
+  sm = KRG(
+      xspecs=xspecs, categorical_kernel=MixIntKernelType.GOWER, print_global=False
+  )
   mixint = MixedIntegerContext(xspecs)
   n_doe = 3
   sampling = mixint.build_sampling_method(LHS, criterion="ese", random_state=42)
@@ -588,7 +588,7 @@ Options
      -  ['str']
      -  Approximated q-EI maximization strategy
   *  -  evaluator
-     -  <smt.applications.ego.Evaluator object at 0x0000022E002AA310>
+     -  <smt.applications.ego.Evaluator object at 0x0000026608CA4640>
      -  None
      -  ['Evaluator']
      -  Object used to run function fun to optimize at x points (nsamples, nxdim)
@@ -618,7 +618,7 @@ Options
      -  ['bool']
      -  Enable the penalization of points that have been already evaluated in EI criterion
   *  -  surrogate
-     -  <smt.surrogate_models.krg.KRG object at 0x0000022E0083B0A0>
+     -  <smt.surrogate_models.krg.KRG object at 0x0000026608CA4430>
      -  None
      -  ['KRG', 'KPLS', 'KPLSK', 'GEKPLS', 'MGP']
      -  SMT kriging-based surrogate model used internaly

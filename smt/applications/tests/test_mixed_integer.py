@@ -649,6 +649,7 @@ class TestMixedInteger(unittest.TestCase):
             )
             > 1e-8
         )
+
     def run_hierarchical_variables_Goldstein(self):
         import numpy as np
         from smt.utils.kriging import XSpecs
@@ -660,18 +661,19 @@ class TestMixedInteger(unittest.TestCase):
         from smt.sampling_methods import LHS
         from smt.surrogate_models import (
             KRG,
-            FLOAT_TYPE,
-            ORD_TYPE,
-            ENUM_TYPE,
-            NEUTRAL_ROLE,
-            META_ROLE,
-            DECREED_ROLE,
-            HOMO_HSPHERE_KERNEL,
+            KPLS,
+            QP,
+            XType,
+            XRole,
+            MixIntKernelType,
         )
-        def f_hv(X):      
+
+        def f_hv(X):
             import numpy as np
+
             def H(x1, x2, x3, x4, z3, z4, x5, cos_term):
                 import numpy as np
+
                 h = (
                     53.3108
                     + 0.184901 * x1
@@ -696,16 +698,16 @@ class TestMixedInteger(unittest.TestCase):
                 if cos_term:
                     h += 5.0 * np.cos(2.0 * np.pi * (x5 / 100.0)) - 2.0
                 return h
-            
+
             def f1(x1, x2, z1, z2, z3, z4, x5, cos_term):
                 c1 = z2 == 0
                 c2 = z2 == 1
                 c3 = z2 == 2
-    
+
                 c4 = z3 == 0
                 c5 = z3 == 1
                 c6 = z3 == 2
-    
+
                 y = (
                     c4
                     * (
@@ -727,11 +729,12 @@ class TestMixedInteger(unittest.TestCase):
                     )
                 )
                 return y
+
             def f2(x1, x2, x3, z2, z3, z4, x5, cos_term):
                 c1 = z2 == 0
                 c2 = z2 == 1
                 c3 = z2 == 2
-    
+
                 y = (
                     c1 * H(x1, x2, x3, 20, z3, z4, x5, cos_term)
                     + c2 * H(x1, x2, x3, 50, z3, z4, x5, cos_term)
@@ -743,13 +746,13 @@ class TestMixedInteger(unittest.TestCase):
                 c1 = z1 == 0
                 c2 = z1 == 1
                 c3 = z1 == 2
-    
+
                 y = (
                     c1 * H(x1, x2, 20, x4, z3, z4, x5, cos_term)
                     + c2 * H(x1, x2, 50, x4, z3, z4, x5, cos_term)
                     + c3 * H(x1, x2, 80, x4, z3, z4, x5, cos_term)
                 )
-                return y     
+                return y
 
             y = []
             for x in X:
@@ -785,32 +788,32 @@ class TestMixedInteger(unittest.TestCase):
             [0, 2],  # 9
         ]
         xroles = [
-            META_ROLE,
-            NEUTRAL_ROLE,
-            NEUTRAL_ROLE,
-            NEUTRAL_ROLE,
-            DECREED_ROLE,
-            DECREED_ROLE,
-            NEUTRAL_ROLE,
-            DECREED_ROLE,
-            DECREED_ROLE,
-            NEUTRAL_ROLE,
-            NEUTRAL_ROLE,
+            XRole.META,
+            XRole.NEUTRAL,
+            XRole.NEUTRAL,
+            XRole.NEUTRAL,
+            XRole.DECREED,
+            XRole.DECREED,
+            XRole.NEUTRAL,
+            XRole.DECREED,
+            XRole.DECREED,
+            XRole.NEUTRAL,
+            XRole.NEUTRAL,
         ]
         # z or x, cos?;          x1,x2,          x3, x4,        x5:cos,       z1,z2;            exp1,exp2
 
         xtypes = [
-            (ENUM_TYPE, 4),
-            ORD_TYPE,
-            FLOAT_TYPE,
-            FLOAT_TYPE,
-            FLOAT_TYPE,
-            FLOAT_TYPE,
-            FLOAT_TYPE,
-            ORD_TYPE,
-            ORD_TYPE,
-            ORD_TYPE,
-            ORD_TYPE,
+            (XType.ENUM, 4),
+            XType.ORD,
+            XType.FLOAT,
+            XType.FLOAT,
+            XType.FLOAT,
+            XType.FLOAT,
+            XType.FLOAT,
+            XType.ORD,
+            XType.ORD,
+            XType.ORD,
+            XType.ORD,
         ]
         xspecs = XSpecs(xtypes=xtypes, xlimits=xlimits, xroles=xroles)
         n_doe = 15
@@ -823,7 +826,7 @@ class TestMixedInteger(unittest.TestCase):
         sm = MixedIntegerKrigingModel(
             surrogate=KRG(
                 xspecs=xspecs,
-                categorical_kernel=HOMO_HSPHERE_KERNEL,
+                categorical_kernel=MixIntKernelType.HOMO_HSPHERE,
                 theta0=[1e-2],
                 corr="abs_exp",
                 n_start=5,
@@ -1260,6 +1263,7 @@ class TestMixedInteger(unittest.TestCase):
         self.run_mixed_gower_example()
         self.run_mixed_homo_gaussian_example()
         self.run_mixed_homo_hyp_example()
+        self.run_hierarchical_variables_Goldstein()
 
     def run_mixed_gower_example(self):
         import numpy as np

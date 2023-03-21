@@ -668,6 +668,7 @@ class TestMixedInteger(unittest.TestCase):
             XType,
             XRole,
             MixIntKernelType,
+            MixHrcKernelType,
         )
 
         def f_hv(X):
@@ -829,6 +830,7 @@ class TestMixedInteger(unittest.TestCase):
             surrogate=KRG(
                 xspecs=xspecs,
                 categorical_kernel=MixIntKernelType.HOMO_HSPHERE,
+                hierarchical_kernel=MixHrcKernelType.ALG_KERNEL,
                 theta0=[1e-2],
                 corr="abs_exp",
                 n_start=5,

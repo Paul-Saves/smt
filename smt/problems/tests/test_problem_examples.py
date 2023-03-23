@@ -79,7 +79,7 @@ class Test(unittest.TestCase):
     def test_hier_neural_network(self):
         import numpy as np
         import matplotlib.pyplot as plt
-        from smt.problems import HierNN
+        from smt.problems import HierarchicalNeuralNetwork
         from smt.utils.kriging import XSpecs
         from smt.applications.mixed_integer import (
             MixedIntegerContext,
@@ -94,7 +94,7 @@ class Test(unittest.TestCase):
             MixIntKernelType,
         )
 
-        problem = HierNN()
+        problem = HierarchicalNeuralNetwork()
 
         n_doe = 4
         xlimits = [

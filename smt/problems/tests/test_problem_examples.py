@@ -76,7 +76,7 @@ class Test(unittest.TestCase):
         xdoe = sampling(n_doe)
         y = problem(xdoe)
         
-        plt.plot(x[:, 0], y[:, 0])
+        plt.plot(xdoe[:, 0], y[:, 0])
         plt.xlabel("x")
         plt.ylabel("y")
         plt.show()
@@ -141,7 +141,7 @@ class Test(unittest.TestCase):
         xdoe = sampling(n_doe)
         y = problem(xdoe)
         
-        plt.plot(x[:, 0], y[:, 0])
+        plt.plot(xdoe[:, 0], y[:, 0])
         plt.xlabel("x")
         plt.ylabel("y")
         plt.show()

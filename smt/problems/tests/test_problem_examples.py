@@ -56,7 +56,7 @@ class Test(unittest.TestCase):
 
         problem = MixedCantileverBeam()
 
-        n_doe = 4
+        n_doe = 100
         xtypes = [(XType.ENUM, 12), XType.FLOAT, XType.FLOAT]
         xlimits = np.array(
             [
@@ -101,7 +101,7 @@ class Test(unittest.TestCase):
 
         problem = HierarchicalNeuralNetwork()
 
-        n_doe = 4
+        n_doe = 100
         xlimits = [
             [1, 3],  # meta ord
             [-5, -2],

@@ -75,6 +75,11 @@ class Test(unittest.TestCase):
         )
         xdoe = sampling(n_doe)
         y = problem(xdoe)
+        
+        plt.plot(x[:, 0], y[:, 0])
+        plt.xlabel("x")
+        plt.ylabel("y")
+        plt.show()
 
     def test_hier_neural_network(self):
         import numpy as np
@@ -135,6 +140,11 @@ class Test(unittest.TestCase):
         )
         xdoe = sampling(n_doe)
         y = problem(xdoe)
+        
+        plt.plot(x[:, 0], y[:, 0])
+        plt.xlabel("x")
+        plt.ylabel("y")
+        plt.show()
 
     def test_robot_arm(self):
         import numpy as np

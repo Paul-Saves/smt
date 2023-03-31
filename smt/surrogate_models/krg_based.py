@@ -119,8 +119,8 @@ class KrgBased(SurrogateModel):
         )
         declare(
             "hyper_opt",
-            "Cobyla",
-            values=("Cobyla", "TNC"),
+            "SLSQP",
+            values=("Cobyla", "TNC", "SLSQP"),
             desc="Optimiser for hyperparameters optimisation",
             types=str,
         )
@@ -1505,7 +1505,6 @@ class KrgBased(SurrogateModel):
                             )
                             if optimal_theta_res_loop["fun"] < optimal_theta_res["fun"]:
                                 optimal_theta_res = optimal_theta_res_loop
-
                     elif self.options["hyper_opt"] == "TNC":
                         theta_all_loops = 10**theta_all_loops
                         for theta0_loop in theta_all_loops:
@@ -1515,7 +1514,20 @@ class KrgBased(SurrogateModel):
                                 method="TNC",
                                 jac=grad_minus_reduced_likelihood_function,
                                 bounds=bounds_hyp,
-                                options={"maxiter": 100},
+                                options={"maxiter": limit},
+                            )
+                            if optimal_theta_res_loop["fun"] < optimal_theta_res["fun"]:
+                                optimal_theta_res = optimal_theta_res_loop
+                    elif self.options["hyper_opt"] == "SLSQP":
+                        theta_all_loops = 10**theta_all_loops
+                        for theta0_loop in theta_all_loops:
+                            optimal_theta_res_loop = optimize.minimize(
+                                minus_reduced_likelihood_function,
+                                theta0_loop,
+                                method="SLSQP",
+                                #   jac=grad_minus_reduced_likelihood_function,
+                                bounds=bounds_hyp,
+                                options={"maxiter": limit},
                             )
                             if optimal_theta_res_loop["fun"] < optimal_theta_res["fun"]:
                                 optimal_theta_res = optimal_theta_res_loop

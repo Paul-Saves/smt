@@ -1019,7 +1019,7 @@ class TestMixedInteger(unittest.TestCase):
                 design_space=design_space,
                 theta0=[1e-2],
                 corr="abs_exp",
-                categorical_kernel=MixIntKernelType.CONT_RELAX,
+                categorical_kernel=MixIntKernelType.GOWER,
             ),
         )
         sm.set_training_values(xt, yt)
@@ -1037,6 +1037,9 @@ class TestMixedInteger(unittest.TestCase):
         yvar = sm.predict_variances(x_pred)
 
         # prediction are correct on known points
+        self.assertAlmostEqual(y[20, 0], 0)
+        self.assertAlmostEqual(y[50, 0], 1)
+        self.assertAlmostEqual(y[95, 0], 1.5)
         self.assertTrue(np.abs(np.sum(np.array([y[20], y[50], y[95]]) - yt)) < 1e-6)
         self.assertTrue(np.abs(np.sum(np.array([yvar[20], yvar[50], yvar[95]]))) < 1e-6)
 

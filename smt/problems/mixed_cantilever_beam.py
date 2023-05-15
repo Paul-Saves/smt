@@ -8,6 +8,7 @@ P. Saves, Y. Diouane, N. Bartoli, T. Lefebvre, and J. Morlier. A mixed-categoric
 import numpy as np
 
 from smt.problems.problem import Problem
+from smt.utils.design_space import DesignSpace, FloatVariable, CategoricalVariable
 
 
 class MixedCantileverBeam(Problem):
@@ -34,6 +35,16 @@ class MixedCantileverBeam(Problem):
             0.138,
             0.369,
         ]
+
+        self._set_design_space(
+            DesignSpace(
+                [
+                    CategoricalVariable(values=[str(i + 1) for i in range(12)]),
+                    FloatVariable(10.0, 20.0),
+                    FloatVariable(1.0, 2.0),
+                ]
+            )
+        )
 
     def _evaluate(self, x, kx=0):
         """

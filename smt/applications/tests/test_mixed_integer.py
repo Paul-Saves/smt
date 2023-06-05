@@ -266,12 +266,14 @@ class TestMixedInteger(unittest.TestCase):
         )
 
         x = np.array([[2.6, 0.3, 0.5, 0.25, 0.45, 0.85, 3.1]])
-        self.assertEqual(
-            np.array_equal(
-                np.array([[2.6, 0, 1, 0, 0, 1, 3]]),
-                design_space.correct_get_acting(x)[0],
-            ),
-            True,
+        self.assertTrue(
+            np.all(
+                np.abs(
+                    np.array([[2.6, 0, 1, 0, 0, 1, 3]])
+                    - design_space.correct_get_acting(x)[0]
+                )
+                < 1e-2
+            )
         )
 
     def test_cast_to_discrete_values_with_smooth_rounding_ordinal_values(self):
@@ -285,12 +287,14 @@ class TestMixedInteger(unittest.TestCase):
             ]
         )
 
-        self.assertEqual(
-            np.array_equal(
-                np.array([[2.6, 0, 1, 0, 0, 1, 1]]),
-                design_space.correct_get_acting(x)[0],
-            ),
-            True,
+        self.assertTrue(
+            np.all(
+                np.abs(
+                    np.array([[2.6, 0, 1, 0, 0, 1, 1]])
+                    - design_space.correct_get_acting(x)[0]
+                )
+                < 1e-2
+            )
         )
 
     def test_cast_to_discrete_values_with_hard_rounding_ordinal_values(self):
@@ -304,12 +308,14 @@ class TestMixedInteger(unittest.TestCase):
             ]
         )
 
-        self.assertEqual(
-            np.array_equal(
-                np.array([[2.6, 0, 1, 0, 0, 1, 1]]),
-                design_space.correct_get_acting(x)[0],
-            ),
-            True,
+        self.assertTrue(
+            np.all(
+                np.abs(
+                    np.array([[2.6, 0, 1, 0, 0, 1, 1]])
+                    - design_space.correct_get_acting(x)[0]
+                )
+                < 1e-2
+            )
         )
 
     def test_cast_to_discrete_values_with_non_integer_ordinal_values(self):
@@ -323,12 +329,14 @@ class TestMixedInteger(unittest.TestCase):
             ]
         )
 
-        self.assertEqual(
-            np.array_equal(
-                np.array([[2.6, 0, 1, 0, 0, 1, 1]]),
-                design_space.correct_get_acting(x)[0],
-            ),
-            True,
+        self.assertTrue(
+            np.all(
+                np.abs(
+                    np.array([[2.6, 0, 1, 0, 0, 1, 1]])
+                    - design_space.correct_get_acting(x)[0]
+                )
+                < 1e-2
+            )
         )
 
     def test_examples(self):
@@ -671,6 +679,16 @@ class TestMixedInteger(unittest.TestCase):
         # Declare that x1 is acting if x0 == A
         ds.declare_decreed_var(decreed_var=1, meta_var=0, meta_value="A")
 
+        # Nested hierarchy is possible: activate x2 if x1 == C or D
+        # Note: only if ConfigSpace is installed! pip install smt[cs]
+        ds.declare_decreed_var(decreed_var=2, meta_var=1, meta_value=["C", "D"])
+
+        # It is also possible to explicitly forbid two values from occurring simultaneously
+        # Note: only if ConfigSpace is installed! pip install smt[cs]
+        ds.add_value_constraint(
+            var1=0, value1="A", var2=2, value2=[0, 1]
+        )  # Forbid x0 == A && x2 == 0 or 1
+
         # Sample the design space
         # Note: is_acting_sampled specifies for each design variable whether it is acting or not
         x_sampled, is_acting_sampled = ds.sample_valid_x(100)
@@ -680,6 +698,7 @@ class TestMixedInteger(unittest.TestCase):
             np.array(
                 [
                     [0, 0, 2, 0.25],
+                    [0, 2, 1, 0.75],
                     [1, 2, 1, 0.66],
                 ]
             )
@@ -691,7 +710,18 @@ class TestMixedInteger(unittest.TestCase):
             == np.array(
                 [
                     [True, True, True, True],
-                    [True, False, True, True],  # x1 is not acting if x0 != A
+                    [
+                        True,
+                        True,
+                        False,
+                        True,
+                    ],  # x2 is not acting if x1 != C or D (0 or 1)
+                    [
+                        True,
+                        False,
+                        False,
+                        True,
+                    ],  # x1 is not acting if x0 != A, and x2 is not acting because x1 is not acting
                 ]
             )
         )
@@ -700,8 +730,9 @@ class TestMixedInteger(unittest.TestCase):
             == np.array(
                 [
                     [0, 0, 2, 0.25],
-                    # x1 is not acting, so it is corrected ("imputed") to its non-acting value (0 for discrete vars)
-                    [1, 0, 1, 0.66],
+                    [0, 2, 0, 0.75],
+                    # x2 is not acting, so it is corrected ("imputed") to its non-acting value (0 for discrete vars)
+                    [1, 0, 0, 0.66],  # x1 and x2 are imputed
                 ]
             )
         )

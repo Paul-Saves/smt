@@ -272,7 +272,7 @@ class TestMixedInteger(unittest.TestCase):
                     np.array([[2.6, 0, 1, 0, 0, 1, 3]])
                     - design_space.correct_get_acting(x)[0]
                 )
-                < 1e-2
+                < 1e-9
             )
         )
 
@@ -293,7 +293,7 @@ class TestMixedInteger(unittest.TestCase):
                     np.array([[2.6, 0, 1, 0, 0, 1, 1]])
                     - design_space.correct_get_acting(x)[0]
                 )
-                < 1e-2
+                < 1e-9
             )
         )
 
@@ -314,7 +314,7 @@ class TestMixedInteger(unittest.TestCase):
                     np.array([[2.6, 0, 1, 0, 0, 1, 1]])
                     - design_space.correct_get_acting(x)[0]
                 )
-                < 1e-2
+                < 1e-9
             )
         )
 
@@ -335,7 +335,7 @@ class TestMixedInteger(unittest.TestCase):
                     np.array([[2.6, 0, 1, 0, 0, 1, 1]])
                     - design_space.correct_get_acting(x)[0]
                 )
-                < 1e-2
+                < 1e-9
             )
         )
 

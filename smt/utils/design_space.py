@@ -519,12 +519,6 @@ class BaseDesignSpace:
                     is_acting_unfolded[:, i_x_unfold] = is_acting[:, i]
                 i_x_unfold += 1
 
-        # =============================================================================
-        #         x_unfolded = x_unfolded[:, :i_x_unfold]
-        #         if is_acting is not None:
-        #             is_acting_unfolded = is_acting_unfolded[:, :i_x_unfold]
-        #
-        # =============================================================================
         return x_unfolded, is_acting_unfolded
 
     def _get_n_dim_unfolded(self) -> int:

@@ -48,7 +48,7 @@ def ensure_design_space(xt=None, xlimits=None, design_space=None) -> "BaseDesign
         return DesignSpace(xlimits)
 
     if xt is not None:
-        return DesignSpace([[0, 1]] * xt.shape[1])
+        return DesignSpace([[np.min(xt), np.max(xt)]] * xt.shape[1])
 
     raise ValueError("Nothing defined that could be interpreted as a design space!")
 

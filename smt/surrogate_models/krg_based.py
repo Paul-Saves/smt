@@ -586,7 +586,7 @@ class KrgBased(SurrogateModel):
                     self.options["n_comp"] if "n_comp" in self.options else None
                 )
                 self.options["n_comp"] = int(n_levels[i] / 2 * (n_levels[i] - 1))
-                X_full_space = compute_X_cross(X_icat,  self.n_levels_origin[i])
+                X_full_space = compute_X_cross(X_icat, self.n_levels_origin[i])
                 try:
                     self.coeff_pls = self.coeff_pls_cat[i]
                 except IndexError:
@@ -1776,12 +1776,10 @@ class KrgBased(SurrogateModel):
         """
         d = self.options["n_comp"] if "n_comp" in self.options else self.nx
         if self.name in ["KPLS"]:
-# =============================================================================
-#             if self.options["corr"] not in ["pow_exp", "squar_exp", "abs_exp"]:
-#                 raise ValueError(
-#                     "KPLS only works with a squared exponential, or an absolute exponential kernel with variable power"
-#                 )
-# =============================================================================
+            if self.options["corr"] not in ["pow_exp", "squar_exp", "abs_exp"]:
+                raise ValueError(
+                    "KPLS only works with a squared exponential, or an absolute exponential kernel with variable power"
+                )
             if (
                 self.options["categorical_kernel"]
                 not in [

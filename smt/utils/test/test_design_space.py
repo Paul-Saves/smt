@@ -39,6 +39,7 @@ class Test(unittest.TestCase):
         self.assertEqual(float_var.get_limits(), (0, 1))
         self.assertTrue(str(float_var))
         self.assertTrue(repr(float_var))
+        self.assertEqual("FloatVariable", float_var.get_typename())
 
         with self.assertRaises(ValueError):
             IntegerVariable(1, 0)
@@ -49,6 +50,7 @@ class Test(unittest.TestCase):
         self.assertEqual(int_var.get_limits(), (0, 1))
         self.assertTrue(str(int_var))
         self.assertTrue(repr(int_var))
+        self.assertEqual("IntegerVariable", int_var.get_typename())
 
         with self.assertRaises(ValueError):
             OrdinalVariable([])
@@ -62,6 +64,7 @@ class Test(unittest.TestCase):
         self.assertEqual(ord_var.upper, 2)
         self.assertTrue(str(ord_var))
         self.assertTrue(repr(ord_var))
+        self.assertEqual("OrdinalVariable", ord_var.get_typename())
 
         with self.assertRaises(ValueError):
             CategoricalVariable([])
@@ -75,6 +78,7 @@ class Test(unittest.TestCase):
         self.assertEqual(cat_var.upper, 2)
         self.assertTrue(str(cat_var))
         self.assertTrue(repr(cat_var))
+        self.assertEqual("CategoricalVariable", cat_var.get_typename())
 
     def test_rounding(self):
         ds = BaseDesignSpace(

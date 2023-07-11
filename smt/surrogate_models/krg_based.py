@@ -372,6 +372,7 @@ class KrgBased(SurrogateModel):
         self._new_train()
 
     def _initialize_theta(self, theta, n_levels, cat_features, cat_kernel):
+        self.n_levels_origin = n_levels
         if self._corr_params is not None:
             return self._corr_params
         nx = self.nx
@@ -585,7 +586,7 @@ class KrgBased(SurrogateModel):
                     self.options["n_comp"] if "n_comp" in self.options else None
                 )
                 self.options["n_comp"] = int(n_levels[i] / 2 * (n_levels[i] - 1))
-                X_full_space = compute_X_cross(X_icat, n_levels[i])
+                X_full_space = compute_X_cross(X_icat, self.n_levels_origin[i])
                 try:
                     self.coeff_pls = self.coeff_pls_cat[i]
                 except IndexError:
@@ -595,7 +596,7 @@ class KrgBased(SurrogateModel):
                 if x is not None:
                     x_icat = x[:, cat_features]
                     x_icat = x_icat[:, i]
-                    x_full_space = compute_X_cross(x_icat, n_levels[i])
+                    x_full_space = compute_X_cross(x_icat, self.n_levels_origin[i])
                     dx_cat_i = cross_levels_homo_space(
                         x_full_space, self.ij, y=X_full_space
                     )
@@ -697,8 +698,8 @@ class KrgBased(SurrogateModel):
         if self.options["use_het_noise"]:
             noise = self.optimal_noise
         if self.options["eval_noise"] and not self.options["use_het_noise"]:
-            theta = tmp_var[0 : self.D.shape[1]]
-            noise = tmp_var[self.D.shape[1] :]
+            theta = tmp_var[0:-1]
+            noise = tmp_var[-1]
         if not (self.is_continuous):
             dx = self.D
             r = self._matrix_data_corr(
@@ -1513,7 +1514,7 @@ class KrgBased(SurrogateModel):
                 )
                 return res
 
-        limit, _rhobeg = 15 * len(self.options["theta0"]), 0.5
+        limit, _rhobeg = max(10 * len(self.options["theta0"]), 25), 0.5
         exit_function = False
         if "KPLSK" in self.name:
             n_iter = 1

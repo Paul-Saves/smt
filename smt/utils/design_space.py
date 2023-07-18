@@ -545,7 +545,7 @@ class BaseDesignSpace:
         """
         raise NotImplementedError
 
-    def _sample_valid_x(self, n: int) -> Tuple[np.ndarray, np.ndarray]:
+    def _sample_valid_x(self, n: int, **kwargs) -> Tuple[np.ndarray, np.ndarray]:
         """
         Sample n design vectors and additionally return the is_acting matrix.
 

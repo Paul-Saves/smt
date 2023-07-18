@@ -299,7 +299,7 @@ class BaseDesignSpace:
         ]
         return decoded_des_vectors[0] if is_1d else decoded_des_vectors
 
-    def sample_valid_x(self, n: int, unfolded=False) -> Tuple[np.ndarray, np.ndarray]:
+    def sample_valid_x(self, n: int, unfolded=False, **kwargs) -> Tuple[np.ndarray, np.ndarray]:
         """
         Sample n design vectors and additionally return the is_acting matrix.
 
@@ -319,7 +319,7 @@ class BaseDesignSpace:
         """
 
         # Sample from the design space
-        x, is_acting = self._sample_valid_x(n)
+        x, is_acting = self._sample_valid_x(n,**kwargs)
 
         # Check conditionally-acting status
         if np.any(~is_acting[:, ~self.is_conditionally_acting]):
@@ -738,12 +738,14 @@ class DesignSpace(BaseDesignSpace):
 
         return x_corr, is_acting
 
-    def _sample_valid_x(self, n: int) -> Tuple[np.ndarray, np.ndarray]:
+    def _sample_valid_x(self, n: int,**kwargs) -> Tuple[np.ndarray, np.ndarray]:
         """Sample design vectors"""
 
         # Simplified implementation: sample design vectors in unfolded space
         x_limits_unfolded = self.get_unfolded_num_bounds()
-        sampler = LHS(xlimits=x_limits_unfolded, random_state=self.seed)
+        if ('random_state' in kwargs.keys()):
+            self.seed = kwargs["random_state"]
+        sampler = LHS(xlimits=x_limits_unfolded, **kwargs)
         x = sampler(n)
 
         # Cast to discrete and fold

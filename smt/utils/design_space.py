@@ -750,9 +750,9 @@ class DesignSpace(BaseDesignSpace):
         sampler = LHS(xlimits=x_limits_unfolded, **kwargs)
         x = sampler(n)
 
-        # Cast to discrete and fold
-        self._normalize_x(x)
+        # Fold and cast to discrete
         x, _ = self.fold_x(x)
+        self._normalize_x(x)
 
         # Get acting information and impute
         return self.correct_get_acting(x)

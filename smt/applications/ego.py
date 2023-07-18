@@ -23,6 +23,7 @@ from smt.utils.design_space import (
 )
 from smt.sampling_methods import LHS
 
+
 class Evaluator(object):
     """
     An interface for evaluation of a function at x points (nsamples of dimension nx).
@@ -264,11 +265,21 @@ class EGO(SurrogateBasedApplication):
                 self.design_space,
                 work_in_folded_space=True,
             )
-            self._sampling = self.mixint.build_sampling_method(LHS, criterion="ese",random_state=self.options['random_state'], new_sampler=True)
+            self._sampling = self.mixint.build_sampling_method(
+                LHS,
+                criterion="ese",
+                random_state=self.options["random_state"],
+                new_sampler=True,
+            )
 
         else:
             self.mixint = None
-            self._sampling = lambda n: self.design_space.sample_valid_x(n,criterion="ese",random_state=self.options['random_state'], new_sampler=True)[0]
+            self._sampling = lambda n: self.design_space.sample_valid_x(
+                n,
+                criterion="ese",
+                random_state=self.options["random_state"],
+                new_sampler=True,
+            )[0]
             self.categorical_kernel = None
 
         # Build DOE

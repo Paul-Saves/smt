@@ -636,7 +636,9 @@ class DesignSpace(BaseDesignSpace):
 
     """
 
-    def __init__(self, design_variables: Union[List[DesignVariable], list, np.ndarray], seed=None):
+    def __init__(
+        self, design_variables: Union[List[DesignVariable], list, np.ndarray], seed=None
+    ):
         self.sampler = None
         self.new_sampler = True
 
@@ -748,12 +750,12 @@ class DesignSpace(BaseDesignSpace):
         x_limits_unfolded = self.get_unfolded_num_bounds()
         if "random_state" in kwargs.keys():
             self.seed = kwargs["random_state"]
-        if "new_sampler" in kwargs.keys() and kwargs["new_sampler"] :
+        if "new_sampler" in kwargs.keys() and kwargs["new_sampler"]:
             kwargs.pop("new_sampler", None)
-            if self.new_sampler :
+            if self.new_sampler:
                 self.sampler = LHS(xlimits=x_limits_unfolded, **kwargs)
-                self.new_sampler=False
-        if self.sampler is None :
+                self.new_sampler = False
+        if self.sampler is None:
             self.sampler = LHS(xlimits=x_limits_unfolded, **kwargs)
         x = self.sampler(n)
 

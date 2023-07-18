@@ -302,7 +302,9 @@ class MixedIntegerContext(object):
         return_folded = self._work_in_folded_space
 
         def sample(n):
-            x, _ = self._design_space.sample_valid_x(n, unfolded=not return_folded,**kwargs)
+            x, _ = self._design_space.sample_valid_x(
+                n, unfolded=not return_folded, **kwargs
+            )
             return x
 
         return sample

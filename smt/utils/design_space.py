@@ -636,9 +636,10 @@ class DesignSpace(BaseDesignSpace):
 
     """
 
-    def __init__(
-        self, design_variables: Union[List[DesignVariable], list, np.ndarray], seed=None
-    ):
+    def __init__(self, design_variables: Union[List[DesignVariable], list, np.ndarray], seed=None):
+        self.sampler = None
+        self.new_sampler = True
+
         # Assume float variable bounds as inputs
         def _is_num(val):
             try:
@@ -747,8 +748,14 @@ class DesignSpace(BaseDesignSpace):
         x_limits_unfolded = self.get_unfolded_num_bounds()
         if "random_state" in kwargs.keys():
             self.seed = kwargs["random_state"]
-        sampler = LHS(xlimits=x_limits_unfolded, **kwargs)
-        x = sampler(n)
+        if "new_sampler" in kwargs.keys() and kwargs["new_sampler"] :
+            kwargs.pop("new_sampler", None)
+            if self.new_sampler :
+                self.sampler = LHS(xlimits=x_limits_unfolded, **kwargs)
+                self.new_sampler=False
+        if self.sampler is None :
+            self.sampler = LHS(xlimits=x_limits_unfolded, **kwargs)
+        x = self.sampler(n)
 
         # Fold and cast to discrete
         x, _ = self.fold_x(x)

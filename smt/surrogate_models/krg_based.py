@@ -507,7 +507,6 @@ class KrgBased(SurrogateModel):
         else:
             X_pls_space, _ = compute_X_cont(X, design_space)
         if cat_kernel_comps is not None or ncomp < 1e5:
-            ###Modifier la condition : if PLS cont
             if np.size(self.pls_coeff_cont) == 0:
                 X, y = self._compute_pls(X_pls_space.copy(), y.copy())
                 self.pls_coeff_cont = self.coeff_pls

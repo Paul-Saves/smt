@@ -943,7 +943,7 @@ class DesignSpace(BaseDesignSpace):
         # Fold and cast to discrete
         x, _ = self.fold_x(x)
         self._normalize_x(x, cs_normalize=False)
-    
+
         # Get acting information and impute
         return self.correct_get_acting(x)
 

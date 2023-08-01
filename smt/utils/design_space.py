@@ -327,7 +327,9 @@ class BaseDesignSpace:
         ]
         return decoded_des_vectors[0] if is_1d else decoded_des_vectors
 
-    def sample_valid_x(self, n: int, unfolded=False) -> Tuple[np.ndarray, np.ndarray]:
+    def sample_valid_x(
+        self, n: int, unfolded=False, **kwargs
+    ) -> Tuple[np.ndarray, np.ndarray]:
         """
         Sample n design vectors and additionally return the is_acting matrix.
 
@@ -347,7 +349,7 @@ class BaseDesignSpace:
         """
 
         # Sample from the design space
-        x, is_acting = self._sample_valid_x(n)
+        x, is_acting = self._sample_valid_x(n, **kwargs)
 
         # Check conditionally-acting status
         if np.any(~is_acting[:, ~self.is_conditionally_acting]):
@@ -586,7 +588,7 @@ class BaseDesignSpace:
         """
         raise NotImplementedError
 
-    def _sample_valid_x(self, n: int) -> Tuple[np.ndarray, np.ndarray]:
+    def _sample_valid_x(self, n: int, **kwargs) -> Tuple[np.ndarray, np.ndarray]:
         """
         Sample n design vectors and additionally return the is_acting matrix.
 
@@ -688,6 +690,9 @@ class DesignSpace(BaseDesignSpace):
     def __init__(
         self, design_variables: Union[List[DesignVariable], list, np.ndarray], seed=None
     ):
+        self.sampler = None
+        self.new_sampler = True
+
         # Assume float variable bounds as inputs
         def _is_num(val):
             try:
@@ -910,7 +915,7 @@ class DesignSpace(BaseDesignSpace):
 
         return x_corr, is_acting
 
-    def _sample_valid_x(self, n: int) -> Tuple[np.ndarray, np.ndarray]:
+    def _sample_valid_x(self, n: int, **kwargs) -> Tuple[np.ndarray, np.ndarray]:
         """Sample design vectors"""
 
         if self._cs is not None:
@@ -924,13 +929,22 @@ class DesignSpace(BaseDesignSpace):
 
         # Simplified implementation: sample design vectors in unfolded space
         x_limits_unfolded = self.get_unfolded_num_bounds()
-        sampler = LHS(xlimits=x_limits_unfolded, random_state=self.seed)
-        x = sampler(n)
 
-        # Cast to discrete and fold
-        self._normalize_x(x, cs_normalize=False)
+        if "random_state" in kwargs.keys():
+            self.seed = kwargs["random_state"]
+        if "new_sampler" in kwargs.keys() and kwargs["new_sampler"]:
+            kwargs.pop("new_sampler", None)
+            if self.new_sampler:
+                self.sampler = LHS(xlimits=x_limits_unfolded, **kwargs)
+                self.new_sampler = False
+        if self.sampler is None:
+            self.sampler = LHS(xlimits=x_limits_unfolded, **kwargs)
+        x = self.sampler(n)
+
+        # Fold and cast to discrete
         x, _ = self.fold_x(x)
-
+        self._normalize_x(x, cs_normalize=False)
+    
         # Get acting information and impute
         return self.correct_get_acting(x)
 

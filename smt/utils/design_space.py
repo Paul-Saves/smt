@@ -918,8 +918,12 @@ class DesignSpace(BaseDesignSpace):
     def _sample_valid_x(self, n: int, **kwargs) -> Tuple[np.ndarray, np.ndarray]:
         """Sample design vectors"""
 
+        if "random_state" in kwargs.keys():
+            self.seed = kwargs["random_state"]
+
         if self._cs is not None:
             # Sample Configuration objects
+            self._cs.seed(self.seed)
             configs = self._cs.sample_configuration(n)
             if n == 1:
                 configs = [configs]
@@ -929,8 +933,6 @@ class DesignSpace(BaseDesignSpace):
 
         # Simplified implementation: sample design vectors in unfolded space
         x_limits_unfolded = self.get_unfolded_num_bounds()
-        if "random_state" in kwargs.keys():
-            self.seed = kwargs["random_state"]
         if "new_sampler" in kwargs.keys() and kwargs["new_sampler"]:
             kwargs.pop("new_sampler", None)
             if self.new_sampler:

@@ -342,7 +342,6 @@ class TestMixedInteger(unittest.TestCase):
 
         num = 40
         x, x_is_acting = design_space.sample_valid_x(num, random_state=42)
-
         cmap = colors.ListedColormap(cat_var.values)
         plt.scatter(x[:, 0], np.zeros(num), c=x[:, 1], cmap=cmap)
         plt.show()

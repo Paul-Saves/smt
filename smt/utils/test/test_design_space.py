@@ -574,6 +574,5 @@ class Test(unittest.TestCase):
         x_cartesian = np.array(list(itertools.product([0, 1, 2], [0, 1, 2])))
         ds.correct_get_acting(x_cartesian)
 
-
 if __name__ == "__main__":
     unittest.main()

@@ -206,7 +206,7 @@ class Test(unittest.TestCase):
         self.assertTrue(np.all(~ds.is_conditionally_acting))
 
         if HAS_CONFIG_SPACE:
-            x, is_acting = ds.sample_valid_x(3)
+            x, is_acting = ds.sample_valid_x(3, random_state=42)
             self.assertEqual(x.shape, (3, 4))
             self.assertTrue(
                 np.all(
@@ -224,7 +224,7 @@ class Test(unittest.TestCase):
                 )
             )
         else:
-            ds.sample_valid_x(3)
+            ds.sample_valid_x(3, random_state=42)
             x = np.array(
                 [
                     [1, 0, 0, 0.834],
@@ -278,7 +278,9 @@ class Test(unittest.TestCase):
         )
         self.assertTrue(np.all(is_acting_corr))
 
-        x_unfolded, is_acting_unfolded = ds.sample_valid_x(3, unfolded=True)
+        x_unfolded, is_acting_unfolded = ds.sample_valid_x(
+            3, unfolded=True, random_state=42
+        )
         self.assertEqual(x_unfolded.shape, (3, 6))
         if HAS_CONFIG_SPACE:
             self.assertTrue(
@@ -287,13 +289,13 @@ class Test(unittest.TestCase):
                         x_unfolded
                         - np.array(
                             [
-                                [1, 0, 0, 1, -1, 0.932],
-                                [0, 0, 1, 1, 0, 0.791],
-                                [0, 0, 1, 1, 1, 1.112],
+                                [0.0, 1.0, 0.0, 0.0, -0.0, 0.83370861],
+                                [0.0, 0.0, 1.0, 0.0, -1.0, 0.64286682],
+                                [0.0, 0.0, 1.0, 0.0, -0.0, 1.15088847],
                             ]
                         )
                     )
-                    < 1e-2
+                    < 1e-8
                 )
             )
 
@@ -419,7 +421,7 @@ class Test(unittest.TestCase):
             )
         )
 
-        x_sampled, is_acting_sampled = ds.sample_valid_x(100)
+        x_sampled, is_acting_sampled = ds.sample_valid_x(100, random_state=42)
         assert x_sampled.shape == (100, 4)
         x_sampled[is_acting_sampled[:, 3], 3] = np.round(
             x_sampled[is_acting_sampled[:, 3], 3]
@@ -514,7 +516,7 @@ class Test(unittest.TestCase):
             )
         )
 
-        x_sampled, is_acting_sampled = ds.sample_valid_x(100)
+        x_sampled, is_acting_sampled = ds.sample_valid_x(100, random_state=42)
         assert x_sampled.shape == (100, 4)
         x_sampled[is_acting_sampled[:, 3], 3] = np.round(
             x_sampled[is_acting_sampled[:, 3], 3]
@@ -552,7 +554,9 @@ class Test(unittest.TestCase):
                     decreed_var=3, meta_var=0, meta_value="A"
                 )  # Activate x3 if x0 == A
 
-                self.assertRaises(RuntimeError, lambda: ds.sample_valid_x(10))
+                self.assertRaises(
+                    RuntimeError, lambda: ds.sample_valid_x(10, random_state=42)
+                )
 
     @unittest.skipIf(not HAS_CONFIG_SPACE, "Hierarchy dependencies not installed")
     def test_restrictive_value_constraint(self):
@@ -565,7 +569,7 @@ class Test(unittest.TestCase):
         assert ds._cs.get_hyperparameters()[0].default_value == 1
 
         ds.add_value_constraint(var1=0, value1=1, var2=0, value2=1)
-        ds.sample_valid_x(100)
+        ds.sample_valid_x(100, random_state=42)
 
         x_cartesian = np.array(list(itertools.product([0, 1, 2], [0, 1, 2])))
         ds.correct_get_acting(x_cartesian)

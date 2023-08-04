@@ -631,6 +631,8 @@ class TestMixedInteger(unittest.TestCase):
             OrdinalVariable,
             CategoricalVariable,
         )
+        from smt.applications.mixed_integer import MixedIntegerKrigingModel
+        from smt.surrogate_models import MixIntKernelType, MixHrcKernelType, KRG
 
         ds = DesignSpace(
             [
@@ -662,8 +664,9 @@ class TestMixedInteger(unittest.TestCase):
 
         # Sample the design space
         # Note: is_acting_sampled specifies for each design variable whether it is acting or not
-        x_sampled, is_acting_sampled = ds.sample_valid_x(100, random_state=42)
-
+        Xt, is_acting_sampled = ds.sample_valid_x(100, random_state=42)
+        rng = np.random.default_rng(42)
+        Yt = 4 * rng.random(100) - 2 + Xt[:, 0] + Xt[:, 1] - Xt[:, 2] - Xt[:, 3]
         # Correct design vectors: round discrete variables, correct hierarchical variables
         x_corr, is_acting = ds.correct_get_acting(
             np.array(
@@ -706,6 +709,56 @@ class TestMixedInteger(unittest.TestCase):
                     [1, 0, 0, 0.66],  # x1 and x2 are imputed
                 ]
             )
+        )
+
+        sm = MixedIntegerKrigingModel(
+            surrogate=KRG(
+                design_space=ds,
+                categorical_kernel=MixIntKernelType.HOMO_HSPHERE,
+                hierarchical_kernel=MixHrcKernelType.ALG_KERNEL,
+                theta0=[1e-2],
+                corr="abs_exp",
+                n_start=5,
+            ),
+        )
+        sm.set_training_values(Xt, Yt)
+        sm.train()
+        y_s = sm.predict_values(Xt)[:, 0]
+        pred_RMSE = np.linalg.norm(y_s - Yt) / len(Yt)
+
+        y_sv = sm.predict_variances(Xt)[:, 0]
+        var_RMSE = np.linalg.norm(y_sv) / len(Yt)
+        self.assertTrue(pred_RMSE < 1e-7)
+        print("Pred_RMSE", pred_RMSE)
+        self.assertTrue(
+            np.linalg.norm(
+                sm.predict_values(
+                    np.array(
+                        [
+                            [0, 2, 1, 0.75],
+                            [1, 2, 1, 0.66],
+                            [0, 2, 1, 0.75],
+                        ]
+                    )
+                )[:, 0]
+                - sm.predict_values(
+                    np.array(
+                        [
+                            [0, 2, 2, 0.75],
+                            [1, 1, 2, 0.66],
+                            [0, 2, 0, 0.75],
+                        ]
+                    )
+                )[:, 0]
+            )
+            < 1e-8
+        )
+        self.assertTrue(
+            np.linalg.norm(
+                sm.predict_values(np.array([[0, 0, 2, 0.25]]))
+                - sm.predict_values(np.array([[0, 0, 2, 0.8]]))
+            )
+            > 1e-8
         )
 
     def run_hierarchical_variables_Goldstein(self):

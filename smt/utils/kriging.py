@@ -299,13 +299,6 @@ def gower_componentwise_distances(
     Y_cat = Z_cat[y_index,]
     x_cat_is_acting = z_cat_is_acting[x_index,]
     y_cat_is_acting = z_cat_is_acting[y_index,]
-
-    # To support categorical decreed variables, some extra math wizardry is needed
-    if np.any(cat_is_decreed) or np.any(~x_cat_is_acting) or np.any(~y_cat_is_acting):
-        raise ValueError(
-            "Decreed (conditionally-active) categorical variables are not supported yet!"
-        )
-
     # This is to normalize the numeric values between 0 and 1.
     Z_num = Z[:, ~cat_features]
     z_num_is_acting = z_is_acting[:, ~cat_features]
@@ -321,7 +314,9 @@ def gower_componentwise_distances(
     x_num_is_acting = z_num_is_acting[x_index,]
     y_num_is_acting = z_num_is_acting[y_index,]
 
-    D_cat = compute_D_cat(X_cat, Y_cat, y)
+    # x_cat_is_acting : activeness vector delta
+    # X_cat( not(x_cat_is_acting)) = 0 ###IMPUTED TO FIRST VALUE IN LIST (index 0)
+    D_cat = compute_D_cat(X_cat, Y_cat, y ,x_cat_is_acting,y_cat_is_acting)
     D_num, ij = compute_D_num(
         X_num,
         Y_num,
@@ -341,7 +336,7 @@ def gower_componentwise_distances(
 
 
 @njit_use(parallel=True)
-def compute_D_cat(X_cat, Y_cat, y):
+def compute_D_cat(X_cat, Y_cat, y,x_cat_is_acting,y_cat_is_acting):
     nx_samples, n_features = X_cat.shape
     ny_samples, n_features = Y_cat.shape
     n_nonzero_cross_dist = nx_samples * ny_samples

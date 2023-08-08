@@ -317,7 +317,7 @@ def gower_componentwise_distances(
 
     # x_cat_is_acting : activeness vector delta
     # X_cat( not(x_cat_is_acting)) = 0 ###IMPUTED TO FIRST VALUE IN LIST (index 0)
-    D_cat = compute_D_cat(X_cat, Y_cat,y)
+    D_cat = compute_D_cat(X_cat, Y_cat, y)
     D_num, ij = compute_D_num(
         X_num,
         Y_num,

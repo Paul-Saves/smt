@@ -1290,6 +1290,7 @@ class KrgBased(SurrogateModel):
                 listcatdecreed = self.design_space.is_conditionally_acting[
                     self.cat_features
                 ]
+
                 if np.any(listcatdecreed):
                     dx = self._correct_distances_cat_decreed(
                         dx,

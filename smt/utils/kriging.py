@@ -303,6 +303,7 @@ def gower_componentwise_distances(
     Z_num = Z[:, ~cat_features]
     z_num_is_acting = z_is_acting[:, ~cat_features]
     num_is_decreed = is_decreed[~cat_features]
+    cat_is_decreed = is_decreed[cat_features]
     num_bounds = design_space.get_num_bounds()[~cat_features, :]
     if num_bounds.shape[0] > 0:
         Z_offset = num_bounds[:, 0]
@@ -316,7 +317,7 @@ def gower_componentwise_distances(
 
     # x_cat_is_acting : activeness vector delta
     # X_cat( not(x_cat_is_acting)) = 0 ###IMPUTED TO FIRST VALUE IN LIST (index 0)
-    D_cat = compute_D_cat(X_cat, Y_cat, y ,x_cat_is_acting,y_cat_is_acting)
+    D_cat = compute_D_cat(X_cat, Y_cat,y)
     D_num, ij = compute_D_num(
         X_num,
         Y_num,
@@ -336,7 +337,7 @@ def gower_componentwise_distances(
 
 
 @njit_use(parallel=True)
-def compute_D_cat(X_cat, Y_cat, y,x_cat_is_acting,y_cat_is_acting):
+def compute_D_cat(X_cat, Y_cat, y):
     nx_samples, n_features = X_cat.shape
     ny_samples, n_features = Y_cat.shape
     n_nonzero_cross_dist = nx_samples * ny_samples

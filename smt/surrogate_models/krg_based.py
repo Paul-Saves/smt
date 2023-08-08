@@ -273,7 +273,7 @@ class KrgBased(SurrogateModel):
         self.X_train = X
         self.is_acting_train = is_acting
         self._corr_params = None
-
+        _, self.cat_features = compute_X_cont(self.X_train, self.design_space)
         if not (self.is_continuous):
             D, self.ij, X = gower_componentwise_distances(
                 X=X,
@@ -292,10 +292,36 @@ class KrgBased(SurrogateModel):
                     _,
                 ) = standardization(X2, self.training_points[None][0][1])
                 D, _ = cross_distances(self.X2_norma)
-            self.Lij, self.n_levels = cross_levels(
-                X=self.X_train, ij=self.ij, design_space=self.design_space
-            )
-            _, self.cat_features = compute_X_cont(self.X_train, self.design_space)
+                self.Lij, self.n_levels = cross_levels(
+                                X=self.X_train, ij=self.ij, design_space=self.design_space
+                            )
+                listcatdecreed = self.design_space.is_conditionally_acting[self.cat_features] 
+                if np.any(listcatdecreed) : 
+                    #D = correct_distances_cat_decreed(D)
+                    indjcat=-1
+                    for j in listcatdecreed :
+                        indjcat = indjcat+1
+                        if j :
+                            indicat = -1
+                            indices=0
+                            for v in range(len(self.design_space.design_variables)) :
+                                if self.design_space.design_variables[v].__class__.__name__ == "CategoricalVariable" :
+                                    indicat = indicat+1
+                                    if indicat == indjcat : 
+                                        ia2 = (is_acting[:,self.cat_features][:,indjcat])[self.ij]
+                                        act_inact = ia2[:,0] ^ ia2[:,1]
+                                        val_act = (                   
+                                            (np.array([1]*self.n_levels[indjcat])-self.X2_offset[indices:indices+self.n_levels[indjcat]])/self.X2_scale[indices:indices+self.n_levels[indjcat]] - 
+                                            (np.array([0]*self.n_levels[indjcat])-self.X2_offset[indices:indices+self.n_levels[indjcat]])/self.X2_scale[indices:indices+self.n_levels[indjcat]])
+                                        D[:,indices:indices+self.n_levels[indjcat] ] [act_inact] = val_act
+                                    else :
+                                        indices = indices+self.n_levels[indicat]
+                                else : 
+                                    indices =indices+1
+        self.Lij, self.n_levels = cross_levels(
+                        X=self.X_train, ij=self.ij, design_space=self.design_space
+                    )
+          
         # Center and scale X and y
         (
             self.X_norma,

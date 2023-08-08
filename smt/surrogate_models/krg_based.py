@@ -1290,10 +1290,6 @@ class KrgBased(SurrogateModel):
                 listcatdecreed = self.design_space.is_conditionally_acting[
                     self.cat_features
                 ]
-                Lij, _ = cross_levels(
-                    X=x, ij=ij, design_space=self.design_space, y=self.X_train
-                )
-                self.ij = ij
                 if np.any(listcatdecreed):
                     dx = self._correct_distances_cat_decreed(
                         dx,

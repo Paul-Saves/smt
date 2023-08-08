@@ -254,7 +254,7 @@ class KrgBased(SurrogateModel):
             self.is_acting_points[name] = is_acting
 
     def _correct_distances_cat_decreed(
-        self, D, is_acting, listcatdecreed, ij, is_acting_y=None
+        self, D, is_acting, listcatdecreed, ij, is_acting_y=None, mode="CONT_RELAX"
     ):
         indjcat = -1
         for j in listcatdecreed:
@@ -281,26 +281,52 @@ class KrgBased(SurrogateModel):
                                 )[ij[:, 1]]
 
                             act_inact = ia2[:, 0] ^ ia2[:, 1]
-                            val_act = (
-                                np.array([1] * self.n_levels[indjcat])
-                                - self.X2_offset[
+                            act_act = ia2[:, 0] & ia2[:, 1]
+
+                            if mode == "CONT_RELAX":
+                                val_act = (
+                                    np.array([1] * self.n_levels[indjcat])
+                                    - self.X2_offset[
+                                        indices : indices + self.n_levels[indjcat]
+                                    ]
+                                ) / self.X2_scale[
+                                    indices : indices + self.n_levels[indjcat]
+                                ] - (
+                                    np.array([0] * self.n_levels[indjcat])
+                                    - self.X2_offset[
+                                        indices : indices + self.n_levels[indjcat]
+                                    ]
+                                ) / self.X2_scale[
                                     indices : indices + self.n_levels[indjcat]
                                 ]
-                            ) / self.X2_scale[
-                                indices : indices + self.n_levels[indjcat]
-                            ] - (
-                                np.array([0] * self.n_levels[indjcat])
-                                - self.X2_offset[
-                                    indices : indices + self.n_levels[indjcat]
-                                ]
-                            ) / self.X2_scale[
-                                indices : indices + self.n_levels[indjcat]
-                            ]
-                            D[:, indices : indices + self.n_levels[indjcat]][
-                                act_inact
-                            ] = val_act
+                                D[:, indices : indices + self.n_levels[indjcat]][
+                                    act_inact
+                                ] = val_act
+                                D[:, indices : indices + self.n_levels[indjcat]][
+                                    act_act
+                                ] = (
+                                    np.sqrt(2)
+                                    * D[:, indices : indices + self.n_levels[indjcat]][
+                                        act_act
+                                    ]
+                                )
+                            elif mode == "GOWER":
+                                D[:, indices : indices + 1][act_inact] = (
+                                    self.n_levels[indjcat] * 0.5
+                                )
+                                D[:, indices : indices + 1][act_act] = (
+                                    np.sqrt(2) * D[:, indices : indices + 1][act_act]
+                                )
+
+                            else:
+                                raise ValueError(
+                                    "Continuous decreed kernel not implemented"
+                                )
                         else:
-                            indices = indices + self.n_levels[indicat]
+                            if mode == "CONT_RELAX":
+                                indices = indices + self.n_levels[indicat]
+                            elif mode == "GOWER":
+                                indices = indices + 1
                     else:
                         indices = indices + 1
         return D
@@ -333,6 +359,20 @@ class KrgBased(SurrogateModel):
                 design_space=self.design_space,
                 hierarchical_kernel=self.options["hierarchical_kernel"],
             )
+            self.Lij, self.n_levels = cross_levels(
+                X=self.X_train, ij=self.ij, design_space=self.design_space
+            )
+            listcatdecreed = self.design_space.is_conditionally_acting[
+                self.cat_features
+            ]
+            if np.any(listcatdecreed):
+                D = self._correct_distances_cat_decreed(
+                    D,
+                    is_acting,
+                    listcatdecreed,
+                    self.ij,
+                    mode="GOWER",
+                )
             if self.options["categorical_kernel"] == MixIntKernelType.CONT_RELAX:
                 X2, _ = self.design_space.unfold_x(self.training_points[None][0][0])
                 (
@@ -352,11 +392,8 @@ class KrgBased(SurrogateModel):
                 ]
                 if np.any(listcatdecreed):
                     D = self._correct_distances_cat_decreed(
-                        D, is_acting, listcatdecreed, self.ij
+                        D, is_acting, listcatdecreed, self.ij, mode="CONT_RELAX"
                     )
-            self.Lij, self.n_levels = cross_levels(
-                X=self.X_train, ij=self.ij, design_space=self.design_space
-            )
 
         # Center and scale X and y
         (
@@ -1234,6 +1271,18 @@ class KrgBased(SurrogateModel):
                 y=np.copy(self.X_train),
                 y_is_acting=self.is_acting_train,
             )
+            listcatdecreed = self.design_space.is_conditionally_acting[
+                self.cat_features
+            ]
+            if np.any(listcatdecreed):
+                dx = self._correct_distances_cat_decreed(
+                    dx,
+                    is_acting,
+                    listcatdecreed,
+                    ij,
+                    is_acting_y=self.is_acting_train,
+                    mode="GOWER",
+                )
             if self.options["categorical_kernel"] == MixIntKernelType.CONT_RELAX:
                 Xpred, _ = self.design_space.unfold_x(x)
                 Xpred_norma = (Xpred - self.X2_offset) / self.X2_scale
@@ -1241,6 +1290,10 @@ class KrgBased(SurrogateModel):
                 listcatdecreed = self.design_space.is_conditionally_acting[
                     self.cat_features
                 ]
+                Lij, _ = cross_levels(
+                    X=x, ij=ij, design_space=self.design_space, y=self.X_train
+                )
+                self.ij = ij
                 if np.any(listcatdecreed):
                     dx = self._correct_distances_cat_decreed(
                         dx,
@@ -1248,6 +1301,7 @@ class KrgBased(SurrogateModel):
                         listcatdecreed,
                         ij,
                         is_acting_y=self.is_acting_train,
+                        mode="CONT_RELAX",
                     )
             Lij, _ = cross_levels(
                 X=x, ij=ij, design_space=self.design_space, y=self.X_train
@@ -1405,6 +1459,18 @@ class KrgBased(SurrogateModel):
                 y=np.copy(self.X_train),
                 y_is_acting=self.is_acting_train,
             )
+            listcatdecreed = self.design_space.is_conditionally_acting[
+                self.cat_features
+            ]
+            if np.any(listcatdecreed):
+                dx = self._correct_distances_cat_decreed(
+                    dx,
+                    is_acting,
+                    listcatdecreed,
+                    ij,
+                    is_acting_y=self.is_acting_train,
+                    mode="GOWER",
+                )
             if self.options["categorical_kernel"] == MixIntKernelType.CONT_RELAX:
                 Xpred, _ = self.design_space.unfold_x(x)
                 Xpred_norma = (Xpred - self.X2_offset) / self.X2_scale
@@ -1419,6 +1485,7 @@ class KrgBased(SurrogateModel):
                         listcatdecreed,
                         ij,
                         is_acting_y=self.is_acting_train,
+                        mode="CONT_RELAX",
                     )
 
             Lij, _ = cross_levels(

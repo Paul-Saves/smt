@@ -354,9 +354,9 @@ class KrgBased(SurrogateModel):
                     D = self._correct_distances_cat_decreed(
                         D, is_acting, listcatdecreed, self.ij
                     )
-        self.Lij, self.n_levels = cross_levels(
-            X=self.X_train, ij=self.ij, design_space=self.design_space
-        )
+            self.Lij, self.n_levels = cross_levels(
+                X=self.X_train, ij=self.ij, design_space=self.design_space
+            )
 
         # Center and scale X and y
         (

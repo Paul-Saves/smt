@@ -691,7 +691,7 @@ class DesignSpace(BaseDesignSpace):
         self, design_variables: Union[List[DesignVariable], list, np.ndarray], seed=None
     ):
         self.sampler = None
-        self.new_sampler = True
+        self.use_new_sampler = True
 
         # Assume float variable bounds as inputs
         def _is_num(val):
@@ -933,11 +933,11 @@ class DesignSpace(BaseDesignSpace):
 
         # Simplified implementation: sample design vectors in unfolded space
         x_limits_unfolded = self.get_unfolded_num_bounds()
-        if "new_sampler" in kwargs.keys() and kwargs["new_sampler"]:
-            kwargs.pop("new_sampler", None)
-            if self.new_sampler:
+        if "use_new_sampler" in kwargs.keys() and kwargs["use_new_sampler"]:
+            kwargs.pop("use_new_sampler", None)
+            if self.use_new_sampler:
                 self.sampler = LHS(xlimits=x_limits_unfolded, **kwargs)
-                self.new_sampler = False
+                self.use_new_sampler = False
         if self.sampler is None:
             self.sampler = LHS(xlimits=x_limits_unfolded, **kwargs)
         x = self.sampler(n)

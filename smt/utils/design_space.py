@@ -920,7 +920,6 @@ class DesignSpace(BaseDesignSpace):
 
         if "random_state" in kwargs.keys():
             self.seed = kwargs["random_state"]
-
         if self._cs is not None:
             # Sample Configuration objects
             self._cs.seed(self.seed)

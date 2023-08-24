@@ -204,7 +204,6 @@ class Test(unittest.TestCase):
         if HAS_CONFIG_SPACE:
             self.assertEqual(len(ds._cs.get_hyperparameters()), 4)
         self.assertTrue(np.all(~ds.is_conditionally_acting))
-
         if HAS_CONFIG_SPACE:
             x, is_acting = ds.sample_valid_x(3, random_state=42)
             self.assertEqual(x.shape, (3, 4))
@@ -233,6 +232,7 @@ class Test(unittest.TestCase):
                 ]
             )
             x, is_acting = ds.correct_get_acting(x)
+
         self.assertEqual(x.shape, (3, 4))
         self.assertEqual(is_acting.shape, x.shape)
 
@@ -573,6 +573,7 @@ class Test(unittest.TestCase):
 
         x_cartesian = np.array(list(itertools.product([0, 1, 2], [0, 1, 2])))
         ds.correct_get_acting(x_cartesian)
+        self.assertRaises(RuntimeError, lambda: ds.sample_valid_x(10, random_state=42))
 
 
 if __name__ == "__main__":

@@ -925,16 +925,19 @@ class DesignSpace(BaseDesignSpace):
         """Sample design vectors"""
 
         self.seed = random_state
-        if self._cs is not None:
-            # Sample Configuration objects
-            self._cs.seed(self.seed)
-            configs = self._cs.sample_configuration(n)
-            if n == 1:
-                configs = [configs]
-
-            # Convert Configuration objects to design vectors and get the is_active matrix
-            return self._configs_to_x(configs)
-
+        # =============================================================================
+        #
+        #         if self._cs is not None:
+        #             # Sample Configuration objects
+        #             self._cs.seed(self.seed)
+        #             configs = self._cs.sample_configuration(n)
+        #             if n == 1:
+        #                 configs = [configs]
+        #
+        #             # Convert Configuration objects to design vectors and get the is_active matrix
+        #             return self._configs_to_x(configs)
+        #
+        # =============================================================================
         # Simplified implementation: sample design vectors in unfolded space
         x_limits_unfolded = self.get_unfolded_num_bounds()
 

@@ -923,35 +923,34 @@ class DesignSpace(BaseDesignSpace):
         self, n: int, random_state=None
     ) -> Tuple[np.ndarray, np.ndarray]:
         """Sample design vectors"""
-
-        self.seed = random_state
-        # =============================================================================
-        #
-        #         if self._cs is not None:
-        #             # Sample Configuration objects
-        #             self._cs.seed(self.seed)
-        #             configs = self._cs.sample_configuration(n)
-        #             if n == 1:
-        #                 configs = [configs]
-        #
-        #             # Convert Configuration objects to design vectors and get the is_active matrix
-        #             return self._configs_to_x(configs)
-        #
-        # =============================================================================
         # Simplified implementation: sample design vectors in unfolded space
         x_limits_unfolded = self.get_unfolded_num_bounds()
+        if self.seed is None:
+            self.seed = random_state
 
-        if self.sampler is None:
-            self.sampler = LHS(
-                xlimits=x_limits_unfolded, random_state=random_state, criterion="ese"
-            )
-        x = self.sampler(n)
+        if self._cs is not None:
+            # Sample Configuration objects
+            self._cs.seed(self.seed)
+            self.seed += 1
+            configs = self._cs.sample_configuration(n)
+            if n == 1:
+                configs = [configs]
+            # Convert Configuration objects to design vectors and get the is_active matrix
+            return self._configs_to_x(configs)
 
-        # Fold and cast to discrete
-        x, _ = self.fold_x(x)
-        self._normalize_x(x, cs_normalize=False)
-        # Get acting information and impute
-        return self.correct_get_acting(x)
+        else:
+            if self.sampler is None:
+                self.sampler = LHS(
+                    xlimits=x_limits_unfolded,
+                    random_state=random_state,
+                    criterion="ese",
+                )
+            x = self.sampler(n)
+            # Fold and cast to discrete
+            x, _ = self.fold_x(x)
+            self._normalize_x(x, cs_normalize=False)
+            # Get acting information and impute
+            return self.correct_get_acting(x)
 
     def _get_correct_config(self, vector: np.ndarray) -> "Configuration":
         config = Configuration(self._cs, vector=vector)

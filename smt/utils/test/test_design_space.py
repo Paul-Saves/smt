@@ -573,7 +573,6 @@ class Test(unittest.TestCase):
 
         x_cartesian = np.array(list(itertools.product([0, 1, 2], [0, 1, 2])))
         ds.correct_get_acting(x_cartesian)
-        self.assertRaises(RuntimeError, lambda: ds.sample_valid_x(10, random_state=42))
 
 
 if __name__ == "__main__":

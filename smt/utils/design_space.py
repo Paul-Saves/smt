@@ -588,6 +588,7 @@ class BaseDesignSpace:
            - Boolean matrix specifying for each variable whether it is acting or non-acting
         """
         raise NotImplementedError
+
     def _sample_valid_x(
         self,
         n: int,
@@ -695,6 +696,7 @@ class DesignSpace(BaseDesignSpace):
         self, design_variables: Union[List[DesignVariable], list, np.ndarray], seed=None
     ):
         self.sampler = None
+
         # Assume float variable bounds as inputs
         def _is_num(val):
             try:
@@ -739,7 +741,6 @@ class DesignSpace(BaseDesignSpace):
                     raise ValueError(f"Unknown variable type: {dv!r}")
 
             self._cs = NoDefaultConfigurationSpace(space=cs_vars, seed=seed)
-
 
         self._meta_vars = (
             {}
@@ -918,14 +919,12 @@ class DesignSpace(BaseDesignSpace):
 
         return x_corr, is_acting
 
-
     def _sample_valid_x(
         self, n: int, random_state=None
     ) -> Tuple[np.ndarray, np.ndarray]:
         """Sample design vectors"""
 
-        if "random_state" in kwargs:
-            self.seed = kwargs["random_state"]
+        self.seed = random_state
         if self._cs is not None:
             # Sample Configuration objects
             self._cs.seed(self.seed)

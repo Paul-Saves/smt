@@ -295,7 +295,6 @@ class MixedIntegerContext(object):
     def design_space(self) -> BaseDesignSpace:
         return self._design_space
 
-
     def build_sampling_method(self, random_state=None):
         """
         Build Mixed Integer LHS ESE sampler.

@@ -267,7 +267,7 @@ class EGO(SurrogateBasedApplication):
             )
             self._sampling = self.mixint.build_sampling_method(
                 random_state=self.options["random_state"],
-           )
+            )
 
         else:
             self.mixint = None

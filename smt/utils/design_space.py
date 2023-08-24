@@ -931,7 +931,8 @@ class DesignSpace(BaseDesignSpace):
         if self._cs is not None:
             # Sample Configuration objects
             self._cs.seed(self.seed)
-            self.seed += 1
+            if self.seed is not None:
+                self.seed += 1
             configs = self._cs.sample_configuration(n)
             if n == 1:
                 configs = [configs]

@@ -529,7 +529,12 @@ class KrgBased(SurrogateModel):
             ncomp = 1e5
 
         theta_cont_features = np.zeros((len(theta), 1), dtype=bool)
-        theta_cat_features = np.zeros((len(theta), len(n_levels)), dtype=bool)
+        theta_cat_features = np.ones((len(theta), len(n_levels)), dtype=bool)
+        if cat_kernel in [
+            MixIntKernelType.EXP_HOMO_HSPHERE,
+            MixIntKernelType.HOMO_HSPHERE,
+        ]:
+            theta_cat_features = np.zeros((len(theta), len(n_levels)), dtype=bool)
         i = 0
         j = 0
         n_theta_cont = 0
@@ -714,17 +719,30 @@ class KrgBased(SurrogateModel):
                 theta_cat_kernel[theta_cat_features[1]] -= (
                     theta_bounds[1] + theta_bounds[0]
                 )
-                theta_cat_kernel[theta_cat_features[1]] *= 1 / theta_bounds[1]
+                theta_cat_kernel[theta_cat_features[1]] *= 1 / (
+                    1.000000000001 * theta_bounds[1]
+                )
 
         for i in range(len(n_levels)):
             theta_cat = theta_cat_kernel[theta_cat_features[0][i]]
-            T = matrix_data_corr_levels_cat_matrix(
-                i,
-                n_levels,
-                theta_cat,
-                theta_bounds,
-                is_ehh=cat_kernel == MixIntKernelType.EXP_HOMO_HSPHERE,
-            )
+            if cat_kernel == MixIntKernelType.COMPOUND_SYMMETRY:
+                T = np.zeros((n_levels[i], n_levels[i]))
+                for tij in range(n_levels[i]):
+                    for tji in range(n_levels[i]):
+                        if tij == tji:
+                            T[tij, tji] = 1
+                        else:
+                            T[tij, tji] = max(
+                                theta_cat[0], 1e-10 - 1 / (n_levels[i] - 1)
+                            )
+            else:
+                T = matrix_data_corr_levels_cat_matrix(
+                    i,
+                    n_levels,
+                    theta_cat,
+                    theta_bounds,
+                    is_ehh=cat_kernel == MixIntKernelType.EXP_HOMO_HSPHERE,
+                )
 
             if cat_kernel_comps is not None:
                 # Sampling points X and y
@@ -786,6 +804,7 @@ class KrgBased(SurrogateModel):
                     in [
                         MixIntKernelType.EXP_HOMO_HSPHERE,
                         MixIntKernelType.HOMO_HSPHERE,
+                        MixIntKernelType.COMPOUND_SYMMETRY,
                     ],
                 )
 

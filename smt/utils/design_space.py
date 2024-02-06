@@ -745,11 +745,7 @@ class DesignSpace(BaseDesignSpace):
                     cs_vars[name] = CategoricalHyperparameter(name, choices=dv.values)
                 else:
                     raise ValueError(f"Unknown variable type: {dv!r}")
-            seed = None
-            if isinstance(random_state, int):
-                seed = random_state
-            elif isinstance(random_state, np.random.RandomState):
-                seed = random_state.get_state()[1][0]
+            seed = self._to_seed(random_state)
 
             self._cs = NoDefaultConfigurationSpace(space=cs_vars, seed=seed)
 
@@ -929,7 +925,7 @@ class DesignSpace(BaseDesignSpace):
 
         return x_corr, is_acting
 
-    def _to_seed(random_state=None):
+    def _to_seed(self, random_state=None):
         seed = None
         if isinstance(random_state, int):
             seed = random_state

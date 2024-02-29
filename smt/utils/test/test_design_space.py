@@ -194,7 +194,7 @@ class Test(unittest.TestCase):
         ds = DesignSpace(
             [
                 CategoricalVariable(["A", "B", "C"]),
-                CategoricalVariable(["E", "F"]),  ### todo
+                OrdinalVariable(["0", "1"]),  ### todo
                 IntegerVariable(-1, 2),
                 FloatVariable(0.5, 1.5),
             ],
@@ -233,18 +233,18 @@ class Test(unittest.TestCase):
         self.assertEqual(is_acting.shape, x.shape)
 
         self.assertEqual(ds.decode_values(x, i_dv=0), ["B", "C", "C"])
-        self.assertEqual(ds.decode_values(x, i_dv=1), ["E", "E", "E"])
+        self.assertEqual(ds.decode_values(x, i_dv=1), ["0", "0", "0"])
         self.assertEqual(ds.decode_values(np.array([0, 1, 2]), i_dv=0), ["A", "B", "C"])
-        self.assertEqual(ds.decode_values(np.array([0, 1]), i_dv=1), ["E", "F"])
+        self.assertEqual(ds.decode_values(np.array([0, 1]), i_dv=1), ["0", "1"])
 
-        self.assertEqual(ds.decode_values(x[0, :]), ["B", "E", 0, x[0, 3]])
-        self.assertEqual(ds.decode_values(x[[0], :]), [["B", "E", 0, x[0, 3]]])
+        self.assertEqual(ds.decode_values(x[0, :]), ["B", "0", 0, x[0, 3]])
+        self.assertEqual(ds.decode_values(x[[0], :]), [["B", "0", 0, x[0, 3]]])
         self.assertEqual(
             ds.decode_values(x),
             [
-                ["B", "E", 0, x[0, 3]],
-                ["C", "E", -1, x[1, 3]],
-                ["C", "E", 0, x[2, 3]],
+                ["B", "0", 0, x[0, 3]],
+                ["C", "0", -1, x[1, 3]],
+                ["C", "0", 0, x[2, 3]],
             ],
         )
 
@@ -263,7 +263,7 @@ class Test(unittest.TestCase):
                 [
                     [2.0, 0.0, -1.0, 1.34158548],
                     [0.0, 1.0, -0.0, 0.55199817],
-                    [1.0, 1.0, 2.0, 1.15663662],
+                    [1.0, 1.0, 1.0, 1.15663662],
                 ]
             ),
             atol=1e-8,

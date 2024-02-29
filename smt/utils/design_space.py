@@ -268,10 +268,17 @@ class BaseDesignSpace:
         # If needed, fold before correcting
         if x_is_unfolded:
             x, _ = self.fold_x(x)
-
+ 
+        indi=0
+        for i in self.design_variables :
+            if not((isinstance(i,FloatVariable))):
+                x[:,indi] = np.int64(np.round(x[:,indi],0))
+            indi+=1
+            
         # Correct and get the is_acting matrix
         x_corrected, is_acting = self._correct_get_acting(x)
-
+     
+                
         # Check conditionally-acting status
         if np.any(~is_acting[:, ~self.is_conditionally_acting]):
             raise RuntimeError("Unconditionally acting variables cannot be non-acting!")

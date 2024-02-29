@@ -810,7 +810,10 @@ class DesignSpace(BaseDesignSpace):
             meta_param = self._get_param2(meta_var)
             # Add a condition that checks for equality (if single value given) or in-collection (if sequence given)
             if isinstance(meta_value, Sequence):
-                condition = InCondition(decreed_param, meta_param, list(np.atleast_1d(np.array(meta_value, dtype=str))))
+                try : 
+                    condition = InCondition(decreed_param, meta_param, list(np.atleast_1d(np.array(meta_value, dtype=str))))
+                except :
+                    condition = InCondition(decreed_param, meta_param, list(np.atleast_1d(np.array(meta_value, dtype=float))))
             else:
                 condition = EqualsCondition(decreed_param, meta_param, str(meta_value))
 
@@ -897,7 +900,10 @@ class DesignSpace(BaseDesignSpace):
             clause1 = ForbiddenEqualsClause(param1, str(value1))
 
         if isinstance(value2, Sequence):
-            clause2 = ForbiddenInClause(param2, list(np.atleast_1d(np.array(value2, dtype=str))))
+            try :
+                clause2 = ForbiddenInClause(param2, list(np.atleast_1d(np.array(value2, dtype=str))))
+            except : 
+                clause2 = ForbiddenInClause(param2, list(np.atleast_1d(np.array(value2, dtype=float))))
         else:
             clause2 = ForbiddenEqualsClause(param2, str(value2))
 

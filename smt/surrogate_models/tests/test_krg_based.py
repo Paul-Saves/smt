@@ -17,11 +17,6 @@ def target_fun(x):
     return np.cos(5 * x)
 
 
-# defining the toy example
-def target_fun(x):
-    return np.cos(5 * x)
-
-
 class TestKrgBased(unittest.TestCase):
     def test_theta0_default_init(self):
         krg = KrgBased()

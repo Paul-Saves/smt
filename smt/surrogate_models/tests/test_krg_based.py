@@ -11,8 +11,6 @@ import numpy as np
 from smt.surrogate_models import KRG
 from smt.surrogate_models.krg_based import KrgBased
 
-from smt.surrogate_models import KRG
-
 
 # defining the toy example
 def target_fun(x):

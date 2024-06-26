@@ -532,14 +532,6 @@ class KrgBased(SurrogateModel):
             ),
         )
 
-    # =============================================================================
-    #         print(linalg.svd(R, compute_uv=False)[-1] < nugget and (np.min(self.D) < 1e-5):
-    #                 warnings.warn(
-    #                     "R is too ill conditioned. Poor combination "
-    #                     "of regression model and observations."
-    #                 )
-    #
-    # =============================================================================
     def _train(self):
         """
         Train the model

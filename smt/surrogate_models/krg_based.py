@@ -520,6 +520,26 @@ class KrgBased(SurrogateModel):
         # if self.name != "MGP":
         #     del self.y_norma, self.D
 
+    def check_training_numerically(self):
+        print(
+            "Minimal distance between two points in any direction is",
+            "{:.2e}".format(np.min(self.D)),
+        )
+        print(
+            "Correlation matrix R condition number is",
+            "{:.2e}".format(
+                np.linalg.cond(self.optimal_par["C"] @ self.optimal_par["C"])
+            ),
+        )
+
+    # =============================================================================
+    #         print(linalg.svd(R, compute_uv=False)[-1] < nugget and (np.min(self.D) < 1e-5):
+    #                 warnings.warn(
+    #                     "R is too ill conditioned. Poor combination "
+    #                     "of regression model and observations."
+    #                 )
+    #
+    # =============================================================================
     def _train(self):
         """
         Train the model
@@ -850,7 +870,7 @@ class KrgBased(SurrogateModel):
                     self.options["n_comp"] = old_n_comp
         return r
 
-    def _reduced_likelihood_function(self, theta, is_optimal_theta=False):
+    def _reduced_likelihood_function(self, theta):
         """
         This function determines the BLUP parameters and evaluates the reduced
         likelihood function for the given autocorrelation parameters theta.
@@ -964,12 +984,6 @@ class KrgBased(SurrogateModel):
             print("exception : ", e)
             print(np.linalg.eig(R)[0])
             return reduced_likelihood_function_value, par
-        if is_optimal_theta:
-            if linalg.svd(R, compute_uv=False)[-1] < nugget and (np.min(self.D) < 1e-5):
-                warnings.warn(
-                    "R is too ill conditioned. Poor combination "
-                    "of regression model and observations."
-                )
 
         # Get generalized least squared solution
         Ft = linalg.solve_triangular(C, self.F, lower=True)
@@ -2033,7 +2047,7 @@ class KrgBased(SurrogateModel):
                         optimal_theta = 10**optimal_theta
 
                     optimal_rlf_value, optimal_par = self._reduced_likelihood_function(
-                        theta=optimal_theta, is_optimal_theta=True
+                        theta=optimal_theta
                     )
                     # Compare the new optimizer to the best previous one
                     if k > 0:

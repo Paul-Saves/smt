@@ -521,8 +521,12 @@ class KrgBased(SurrogateModel):
         #     del self.y_norma, self.D
 
     def check_training_numerically(self):
+        """
+        Check if the training dataset could be an issue and print both the dataset correlation matrix condition number and minimal distance between two points. 
+        """
+      
         print(
-            "Minimal distance between two points in any direction is",
+            "Minimal distance between two points in any dimension is",
             "{:.2e}".format(np.min(self.D)),
         )
         print(

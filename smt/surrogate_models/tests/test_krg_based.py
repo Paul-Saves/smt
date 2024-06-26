@@ -106,7 +106,7 @@ class TestKrgBased(unittest.TestCase):
         t.train()
 
         # Prediction of the validation points
-        y = t.predict_values(xtest)
+        t.predict_values(xtest)
         print("Kriging,  err: " + str(compute_rms_error(t, xtest, ytest)))
         t.check_training_numerically()
         # The variable 'theta0' is a list of length ndim.
@@ -116,7 +116,7 @@ class TestKrgBased(unittest.TestCase):
         t.train()
 
         # Prediction of the validation points
-        y = t.predict_values(xtest)
+        t.predict_values(xtest)
         print("Kriging,  err: " + str(compute_rms_error(t, xtest, ytest)))
         t.check_training_numerically()
 

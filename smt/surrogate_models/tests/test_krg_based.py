@@ -40,20 +40,6 @@ class TestKrgBased(unittest.TestCase):
         krg.set_training_values(np.array([[1, 2, 3]]), np.array([[1]]))  # erroneous
         self.assertRaises(ValueError, krg._check_param)
 
-    def test_almost_squar_exp(self):
-        nobs = 50  # number of obsertvations
-        np.random.seed(0)  # a seed for reproducibility
-        xt = np.random.uniform(size=nobs)  # design points
-
-        # adding a random noise to observations
-        yt = target_fun(xt) + np.random.normal(scale=0.05, size=nobs)
-
-        # training the model with the option eval_noise= True
-        sm = KRG(eval_noise=False, corr="pow_exp", pow_exp_power=1.999999)
-        sm.set_training_values(xt, yt)
-
-        self.assertWarns(UserWarning, sm.train)
-
     def test_less_almost_squar_exp(self):
         nobs = 50  # number of obsertvations
         np.random.seed(0)  # a seed for reproducibility

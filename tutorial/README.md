@@ -62,16 +62,15 @@ These tutorials introduce to use the opensource Surrogate Modeling Toolbox where
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/SMTorg/smt/blob/master/tutorial/Misc/SMT_SGP_analytic.ipynb)
 
+### Cooperative Components Kriging
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/SMTorg/smt/blob/master/tutorial/Misc/SMT_CoopCompKRG.ipynb)
 
 ## Mixed-integer and mixed-hierarchical surrogate models
 
 ### Specific notebook associated to the SMT 2.0 Journal Paper (submitted) with a focus on mixed integer and mixed hierarchical surrogate models (continuous, discrete, categorical)
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/SMTorg/smt/blob/master/tutorial/MixedInteger/RunTestCases_Paper_SMT_v2.ipynb)
-
-### DesignSpace to variables (continuous, discrete, categorical, hierarchical)
-
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/SMTorg/smt/blob/master/tutorial/MixedInteger/SMT_DesignSpace_example.ipynb)
 
 ### Mixed-Integer Gaussian Process and Bayesian Optimization to solve unconstrained problems with mixed variables (continuous, discrete, categorical)
 

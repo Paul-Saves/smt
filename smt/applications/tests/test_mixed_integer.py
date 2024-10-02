@@ -17,7 +17,16 @@ try:
 except ImportError:
     NO_MATPLOTLIB = True
 
-import smt.utils.design_space as ds
+import smt.design_space as ds
+from smt.design_space import (
+    HAS_CONFIG_SPACE,
+    DesignSpace,
+    CategoricalVariable,
+    FloatVariable,
+    IntegerVariable,
+    OrdinalVariable,
+)
+
 from smt.applications.mixed_integer import (
     MixedIntegerContext,
     MixedIntegerKrigingModel,
@@ -32,14 +41,6 @@ from smt.surrogate_models import (
     QP,
     MixHrcKernelType,
     MixIntKernelType,
-)
-from smt.utils.design_space import (
-    HAS_CONFIG_SPACE,
-    CategoricalVariable,
-    DesignSpace,
-    FloatVariable,
-    IntegerVariable,
-    OrdinalVariable,
 )
 
 
@@ -474,10 +475,10 @@ class TestMixedInteger(unittest.TestCase):
 
         from smt.applications.mixed_integer import MixedIntegerSamplingMethod
         from smt.sampling_methods import LHS
-        from smt.utils.design_space import (
-            CategoricalVariable,
-            DesignSpace,
+        from smt.design_space import (
             FloatVariable,
+            DesignSpace,
+            CategoricalVariable,
         )
 
         float_var = FloatVariable(0, 4)
@@ -507,7 +508,7 @@ class TestMixedInteger(unittest.TestCase):
 
         from smt.applications.mixed_integer import MixedIntegerSurrogateModel
         from smt.surrogate_models import QP
-        from smt.utils.design_space import DesignSpace, IntegerVariable
+        from smt.design_space import DesignSpace, IntegerVariable
 
         xt = np.array([0.0, 1.0, 2.0, 3.0, 4.0])
         yt = np.array([0.0, 1.0, 1.5, 0.5, 1.0])
@@ -539,7 +540,7 @@ class TestMixedInteger(unittest.TestCase):
 
         from smt.applications.mixed_integer import MixedIntegerContext
         from smt.surrogate_models import KRG
-        from smt.utils.design_space import (
+        from smt.design_space import (
             CategoricalVariable,
             DesignSpace,
             FloatVariable,
@@ -663,9 +664,8 @@ class TestMixedInteger(unittest.TestCase):
 
         y_sv = sm.predict_variances(Xt)[:, 0]
         var_RMSE = np.linalg.norm(y_sv) / len(Yt)
-        self.assertTrue(pred_RMSE < 1e-7)
-        print("Pred_RMSE", pred_RMSE)
-        self.assertTrue(var_RMSE < 1e-7)
+        self.assertLess(pred_RMSE, 1e-7)
+        self.assertLess(var_RMSE, 1e-7)
         self.assertTrue(
             np.linalg.norm(
                 sm.predict_values(
@@ -748,7 +748,7 @@ class TestMixedInteger(unittest.TestCase):
 
         from smt.applications.mixed_integer import MixedIntegerSamplingMethod
         from smt.sampling_methods import LHS
-        from smt.utils.design_space import (
+        from smt.design_space import (
             CategoricalVariable,
             DesignSpace,
             FloatVariable,
@@ -799,7 +799,7 @@ class TestMixedInteger(unittest.TestCase):
         )
         from smt.sampling_methods import LHS
         from smt.surrogate_models import KRG, MixHrcKernelType, MixIntKernelType
-        from smt.utils.design_space import (
+        from smt.design_space import (
             CategoricalVariable,
             DesignSpace,
             FloatVariable,
@@ -1040,6 +1040,8 @@ class TestMixedInteger(unittest.TestCase):
         for mixint_kernel in [
             MixIntKernelType.CONT_RELAX,
             MixIntKernelType.GOWER,
+            MixIntKernelType.COMPOUND_SYMMETRY,
+            MixIntKernelType.EXP_HOMO_HSPHERE,
             MixIntKernelType.HOMO_HSPHERE,
         ]:
             sm = MixedIntegerKrigingModel(
@@ -1057,10 +1059,10 @@ class TestMixedInteger(unittest.TestCase):
             sm.train()
             y_s = sm.predict_values(Xt)[:, 0]
             _pred_RMSE = np.linalg.norm(y_s - Yt) / len(Yt)
-
+            self.assertLess(_pred_RMSE, 1e-7)
             y_sv = sm.predict_variances(Xt)[:, 0]
             _var_RMSE = np.linalg.norm(y_sv) / len(Yt)
-
+            self.assertLess(_var_RMSE, 1e-7)
             np.testing.assert_almost_equal(
                 sm.predict_values(
                     np.array(
@@ -1098,7 +1100,7 @@ class TestMixedInteger(unittest.TestCase):
         )
         from smt.sampling_methods import LHS
         from smt.surrogate_models import KRG, MixHrcKernelType, MixIntKernelType
-        from smt.utils.design_space import (
+        from smt.design_space import (
             CategoricalVariable,
             DesignSpace,
             FloatVariable,
@@ -1323,9 +1325,8 @@ class TestMixedInteger(unittest.TestCase):
 
         y_sv = sm.predict_variances(Xt)[:, 0]
         var_RMSE = np.linalg.norm(y_sv) / len(Yt)
-        self.assertTrue(pred_RMSE < 1e-7)
-        print("Pred_RMSE", pred_RMSE)
-        self.assertTrue(var_RMSE < 1e-7)
+        self.assertLess(pred_RMSE, 1e-7)
+        self.assertLess(var_RMSE, 1e-7)
         np.testing.assert_almost_equal(
             sm.predict_values(
                 np.array(
@@ -2005,7 +2006,7 @@ class TestMixedInteger(unittest.TestCase):
             MixedIntegerKrigingModel,
         )
         from smt.surrogate_models import KRG, MixIntKernelType
-        from smt.utils.design_space import (
+        from smt.design_space import (
             CategoricalVariable,
             DesignSpace,
             FloatVariable,
@@ -2136,7 +2137,7 @@ class TestMixedInteger(unittest.TestCase):
             MixedIntegerKrigingModel,
         )
         from smt.surrogate_models import KRG, MixIntKernelType
-        from smt.utils.design_space import (
+        from smt.design_space import (
             CategoricalVariable,
             DesignSpace,
             FloatVariable,
@@ -2265,7 +2266,7 @@ class TestMixedInteger(unittest.TestCase):
 
         from smt.applications.mixed_integer import MixedIntegerKrigingModel
         from smt.surrogate_models import KRG, MixIntKernelType
-        from smt.utils.design_space import (
+        from smt.design_space import (
             CategoricalVariable,
             DesignSpace,
             FloatVariable,
@@ -2394,7 +2395,7 @@ class TestMixedInteger(unittest.TestCase):
 
         from smt.applications.mixed_integer import MixedIntegerKrigingModel
         from smt.surrogate_models import KRG, MixIntKernelType
-        from smt.utils.design_space import (
+        from smt.design_space import (
             CategoricalVariable,
             DesignSpace,
             FloatVariable,

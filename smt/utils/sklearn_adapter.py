@@ -23,11 +23,15 @@ class ScikitLearnAdapter(BaseEstimator, RegressorMixin):
 
     def __init__(self, model_cls=QP, **model_kwargs):
         # model_cls must be a subclass of SurrogateModel
-        if not issubclass(model_cls, SurrogateModel):
-            raise ValueError(
-                f"model_cls must be a subclass of SurrogateModel, got {model_cls}"
-            )
-        # store parameters as attributes for get_params/set_params
+        try : 
+            if not issubclass(model_cls, SurrogateModel):
+                raise ValueError(
+                    f"model_cls must be a subclass of SurrogateModel, got {model_cls}"
+                )
+            # store parameters as attributes for get_params/set_params
+        except TypeError :
+            model_cls=QP
+            
         self.model_cls = model_cls
         for name, value in model_kwargs.items():
             setattr(self.model_cls, name, value)

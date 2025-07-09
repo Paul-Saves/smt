@@ -3,9 +3,11 @@ Author: Paul Saves
 """
 
 import unittest
+
 import numpy as np
 from sklearn.utils.estimator_checks import check_estimator
-from smt.surrogate_models import KRG,LS
+
+from smt.surrogate_models import KRG, LS
 from smt.utils.sklearn_adapter import ScikitLearnAdapter
 
 
@@ -14,7 +16,7 @@ class TestSklearnAdapter(unittest.TestCase):
         # Prepare a sample dataset
         rng = np.random.RandomState(0)
         self.X = rng.rand(50, 1)
-        self.y = np.sin(2*self.X).ravel()
+        self.y = np.sin(2 * self.X).ravel()
 
     def test_adapter_basic_fit_predict(self):
         model = ScikitLearnAdapter(LS, print_global=False)
@@ -27,11 +29,13 @@ class TestSklearnAdapter(unittest.TestCase):
 
     def test_get_set_params(self):
         model = ScikitLearnAdapter(KRG, print_global=False, theta0=[2.0])
-        params = dict(model.get_params().pop('model_cls').__dict__)
-#        model.fit(self.X, self.y)
+        params = dict(model.get_params().pop("model_cls").__dict__)
+        #        model.fit(self.X, self.y)
         self.assertIn("theta0", params)
         # Change a param and ensure it takes effect
-        self.assertEqual(dict(model.get_params().pop('model_cls').__dict__)["theta0"], [2.0])
+        self.assertEqual(
+            dict(model.get_params().pop("model_cls").__dict__)["theta0"], [2.0]
+        )
 
     def test_estimator_checks(self):
         """
@@ -42,6 +46,7 @@ class TestSklearnAdapter(unittest.TestCase):
         model = ScikitLearnAdapter(LS, print_global=False)
         model.fit(self.X, self.y)
         check_estimator(model)
+
 
 if __name__ == "__main__":
     unittest.main()

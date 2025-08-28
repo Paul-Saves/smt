@@ -13,7 +13,7 @@ from smt.surrogate_models import QP
 from smt.surrogate_models.surrogate_model import SurrogateModel
 
 
-class ScikitLearnAdapter(RegressorMixin,BaseEstimator):
+class ScikitLearnAdapter(RegressorMixin, BaseEstimator):
     """
     Adapter to wrap SMT SurrogateModel instances with scikit-learn compatible API.
 

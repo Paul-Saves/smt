@@ -8,9 +8,11 @@ import numpy as np
 from scipy.sparse import issparse
 from sklearn.base import BaseEstimator, RegressorMixin
 from sklearn.exceptions import DataConversionWarning, NotFittedError
-
+from sklearn.utils.validation import check_array, check_X_y, check_is_fitted
 from smt.surrogate_models import QP
 from smt.surrogate_models.surrogate_model import SurrogateModel
+
+from sklearn.utils import Tags
 
 
 class ScikitLearnAdapter(RegressorMixin, BaseEstimator):
@@ -20,6 +22,13 @@ class ScikitLearnAdapter(RegressorMixin, BaseEstimator):
     All keyword arguments passed to __init__ (besides model_cls) are treated
     as hyperparameters for the surrogate model.
     """
+
+    def get_tags(self):
+        return Tags(
+            requires_y=True,
+            input_tags={"sparse": False},  # indicates sparse support
+            X_types=["2darray"],
+        )
 
     def __init__(self, model_cls=QP, **model_kwargs):
         # model_cls must be a subclass of SurrogateModel
@@ -38,6 +47,7 @@ class ScikitLearnAdapter(RegressorMixin, BaseEstimator):
             setattr(self, name, value)
 
     def fit(self, X, y):
+        X, y = check_X_y(X, y, accept_sparse=False)
         if issparse(X):
             X = X.toarray()
         # build surrogate model with current hyperparameters
@@ -74,6 +84,8 @@ class ScikitLearnAdapter(RegressorMixin, BaseEstimator):
         return self
 
     def predict(self, X):
+        check_is_fitted(self, "model_")
+        X = check_array(X, accept_sparse=False)
         if issparse(X):
             X = X.toarray()
         X_arr = np.asarray(X)

@@ -81,7 +81,7 @@ class TestSklearnAdapter(unittest.TestCase):
             model.set_params = MethodType(patched_set_params, model)
     
             # Run legacy checks
-           # check_estimator(model, legacy=True)
+            check_estimator(model, legacy=True)
     
             # Restore original methods
             model.get_params = original_get_params

@@ -36,11 +36,3 @@ def check_nx(sm, nx, x):
                 + class_name
                 + " is expecting {} features as input".format(nx)
             )
-
-
-# =============================================================================
-#             raise ValueError(
-#                 "x should have shape [:, {}] and not {}".format(nx, x.shape)
-#             )
-#
-# =============================================================================

@@ -23,6 +23,8 @@ import os
 import numpy as np
 from scipy.spatial.distance import cdist
 
+from smt.utils.checks import _prepare_jax_inputs
+
 
 def _parse_bool_env(name, default=0):
     val = os.getenv(name)
@@ -375,15 +377,6 @@ def _idw_jax(x, xt, p, kx):
         else:
             res = derivs_jit(x_j, xt_j, p, int(kx))
         return np.asarray(res, dtype=float)
-
-
-def _prepare_jax_inputs(jnp, x, nx, dtype):
-    x_in = jnp.asarray(x, dtype=dtype)
-    is_scalar = x_in.ndim <= 1
-    x_arr = jnp.atleast_2d(x_in)
-    if x_arr.shape[-1] != nx:
-        raise ValueError(f"Expected input with {nx} features, got shape {x_in.shape}.")
-    return x_arr, is_scalar
 
 
 def make_idw_jax_predictor(xt, yt, p):

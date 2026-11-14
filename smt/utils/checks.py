@@ -13,6 +13,26 @@ def _is_jax_tracer(x):
     return jax is not None and isinstance(x, jax.core.Tracer)
 
 
+def _enable_jax_x64(jax):
+    """Return a context manager temporarily enabling JAX 64-bit precision."""
+    enable = getattr(jax, "enable_x64", None)
+    if enable is None:
+        enable = jax.experimental.enable_x64
+    return enable(True)
+
+
+def _prepare_jax_inputs(jnp, x, nx, dtype):
+    """Normalize 0D, 1D, or 2D JAX inputs to shape ``(n, nx)`` and validate shape."""
+    x_in = jnp.asarray(x, dtype=dtype)
+    is_scalar = x_in.ndim <= 1
+    x_arr = jnp.atleast_2d(x_in)
+    if x_arr.ndim != 2 or x_arr.shape[-1] != nx:
+        raise ValueError(
+            f"Expected input with {nx} features and rank <= 2, got shape {x_in.shape}."
+        )
+    return x_arr, is_scalar
+
+
 def is_arraylike(array):
     """
     Return True if ``array`` is a NumPy array or an object exposing the NumPy
